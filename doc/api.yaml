@@ -111,7 +111,7 @@ paths:
       tags:
         - Feed tools
       summary: Profile info
-      description: Returns information about a user (follower count, following count, profile picture and posts)
+      description: Returns information about a user (follower count, following count, profile picture (B64-encoded!) and posts)
       operationId: getAccount
       parameters:
         - in: path
@@ -368,70 +368,6 @@ paths:
         '404':
           description: Post not found
 
-  /posts/{postID}/likes:
-    get:
-      tags:
-        - Post tools
-      summary: Post likes
-      description: See who liked your post. Only OP can see who liked the post
-      operationId: getLikes
-      parameters:
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: postID
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Operation successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LikeList'
-        '401':
-          description: Unauthenticated
-        '403':
-          description: Forbidden
-        '404':
-          description: Post not found
-
-  /posts/{postID}/comments:
-    get:
-      tags:
-        - Post tools
-      summary: Post comments
-      description: See who commented on this post
-      operationId: getComments
-      parameters:
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: postID
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Operation successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CommentList'
-        '401':
-          description: Unauthenticated
-        '404':
-          description: Post not found
-
   /feed:
     get:
       tags:
@@ -456,12 +392,12 @@ paths:
         '401':
           description: Unauthenticated
 
-  /feed/{postID}/like:
+  /posts/{postID}/like:
     put:
       tags:
         - Feed tools
       summary: Like a post
-      description: Likes a post from your feed
+      description: Likes a post
       operationId: likePost
       parameters:
         - in: cookie
@@ -481,12 +417,37 @@ paths:
         '401':
           description: Unauthenticated
 
-  /feed/{postID}/comment:
+  /posts/{postID}/unlike:
+    put:
+      tags:
+        - Feed tools
+      summary: Unlikes a post
+      description: Unlikes a post
+      operationId: unlikePost
+      parameters:
+        - in: cookie
+          name: WASASESSIONID
+          description: Your session cookie
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: postID
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Operation successful
+        '401':
+          description: Unauthenticated
+
+  /posts/{postID}/comment:
     put:
       tags:
         - Feed tools
       summary: Comment on a post
-      description: Comments on a post from your feed
+      description: Comments on a post
       operationId: commentPost
       requestBody:
         content:
@@ -513,7 +474,7 @@ paths:
         '401':
           description: Unauthenticated
 
-  /feed/{postID}/{commentID}/like:
+  /comments/{commentID}/like:
     put:
       tags:
         - Feed tools
@@ -528,7 +489,27 @@ paths:
           schema:
             type: string
         - in: path
-          name: postID
+          name: commentID
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Operation successful
+        '401':
+          description: Unauthenticated
+
+  /comments/{commentID}/unlike:
+    put:
+      tags:
+        - Feed tools
+      summary: Unlike a post
+      description: Unlikes a post from your feed
+      operationId: unlikeComment
+      parameters:
+        - in: cookie
+          name: WASASESSIONID
+          description: Your session cookie
           required: true
           schema:
             type: string
@@ -551,6 +532,9 @@ components:
         username:
           type: string
           example: user123
+        proPicB64:
+          type: string
+          format: binary
         followers:
           type: integer
           format: int64

@@ -33,13 +33,12 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"time"
 )
 
 // Data model
 type Account struct {
 	Username	string		`json:"username"`
-	ProPicPath	string		`json:"proPicPath"`
+	ProPicB64	string		`json:"proPicB64"`
 	Followers	uint		`json:"followers"`
 	Following	uint		`json:"following"`
 	Posts		[]int64		`json:"posts"`
@@ -47,8 +46,8 @@ type Account struct {
 
 type Post struct {
 	PostID		int64		`json:"postID"`
-	ImgPath		string		`json:"img_path"`
-	PubTime		time.Time	`json:"pub_time"`
+	ImageB64	string		`json:"imageB64"`
+	PubTime		string		`json:"pub_time"`
 	Caption		string		`json:"caption"`
 	Author		string		`json:"author"`
 	Likes		[]string	`json:"likes"`
@@ -59,7 +58,7 @@ type Comment struct {
 	CommentID	int64		`json:"commentID"`
 	PostID		int64		`json:"postID"`
 	Author		string		`json:"author"`
-	Time		time.Time	`json:"time"`
+	Time		string		`json:"time"`
 	Content		string		`json:"content"`
 	Likes		int64		`json:"likes"`
 }

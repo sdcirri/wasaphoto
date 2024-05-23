@@ -1,15 +1,20 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"time"
+)
 
 func (db *appdbimpl) GetComment(commentID int64) (Comment, error) {
 	var c Comment
-	err := db.c.QueryRow("select * from Comments where commentID = ?", commentID).Scan(&c.CommentID, &c.Time, &c.Author, &c.PostID, &c.Content)
+	var pubts time.Time
+	err := db.c.QueryRow("select * from Comments where commentID = ?", commentID).Scan(&c.CommentID, &pubts, &c.Author, &c.PostID, &c.Content)
 	if err == sql.ErrNoRows {
 		return c, ErrCommentNotFound
 	} else if err != nil {
 		return c, err
 	}
+	c.Time = pubts.Format(time.RFC3339)
 	err = db.c.QueryRow("select count(*) from LikesC where comment = ?", commentID).Scan(&c.Likes)
 	if err == sql.ErrNoRows {
 		c.Likes = 0

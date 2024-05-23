@@ -1,6 +1,9 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"os"
+)
 
 func (db *appdbimpl) RmPost(op string, post int64) error {
 	var ok bool
@@ -13,5 +16,9 @@ func (db *appdbimpl) RmPost(op string, post int64) error {
 		return err
 	}
 	_, err = del.Exec(post)
+	if err != nil {
+		return err
+	}
+	err = os.Remove("/srv/wasaphoto/posts/" + string(post) + ".jpg")
 	return err
 }

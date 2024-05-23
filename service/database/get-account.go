@@ -1,9 +1,14 @@
 package database
 
-import "database/sql"
+import (
+	"encoding/base64"
+	"database/sql"
+	"io/ioutil"
+)
 
 func (db *appdbimpl) GetAccount(id string, username string) (Account, error) {
 	var a Account
+	var imgPath string
 	exists, err := db.UserExists(username)
 	if err != nil {
 		return a, err
@@ -20,7 +25,7 @@ func (db *appdbimpl) GetAccount(id string, username string) (Account, error) {
 		return a, ErrUserNotFound
 	}
 
-	err = db.c.QueryRow("select * from Users where username = ?", username).Scan(&a.Username, &a.ProPicPath)
+	err = db.c.QueryRow("select * from Users where username = ?", username).Scan(&a.Username, imgPath)
 	if err != nil {
 		return a, err
 	}
@@ -52,5 +57,10 @@ func (db *appdbimpl) GetAccount(id string, username string) (Account, error) {
 		a.Posts = append(a.Posts, post)
 	}
 
+	imgRaw, err := ioutil.ReadFile(imgPath)
+	if err != nil {
+		return a, err
+	}
+	a.ProPicB64 = base64.StdEncoding.EncodeToString(imgRaw)
 	return a, nil
 }

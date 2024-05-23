@@ -1,10 +1,17 @@
 package database
 
-import "database/sql"
+import (
+	"encoding/base64"
+	"database/sql"
+	"io/ioutil"
+	"time"
+)
 
 func (db *appdbimpl) GetPost(id string, postid int64) (Post, error) {
 	var p Post
-	err := db.c.QueryRow("select * from Posts where postID = ?", postid).Scan(&p.PostID, &p.ImgPath, &p.PubTime, &p.Author, &p.Caption)
+	var imgPath string
+	var pubts time.Time
+	err := db.c.QueryRow("select * from Posts where postID = ?", postid).Scan(&p.PostID, &imgPath, &pubts, &p.Author, &p.Caption)
 	if err == sql.ErrNoRows {
 		return p, ErrPostNotFound
 	} else if err != nil {
@@ -12,17 +19,13 @@ func (db *appdbimpl) GetPost(id string, postid int64) (Post, error) {
 	}
 	blocked, err := db.IsBlockedBy(id, p.Author)
 	if err != nil {
-		// ErrUserNotFound: people not subscribed should not be able to view posts, so we treat it like an error
-		p.ImgPath = ""			// Best to hide them even if p won't make it in the API response
-		p.Caption = ""
 		return p, err
 	}
 	if blocked {
-		p.ImgPath = ""			// Best to hide them even if p won't make it in the API response
-		p.Caption = ""
 		return p, ErrUserIsBlocked
 	}
 
+	p.PubTime = pubts.Format(time.RFC3339)
 	q, err := db.c.Query("select user from LikesP where post = ?", postid)
 	if err != nil && err != sql.ErrNoRows {
 		return p, err
@@ -51,5 +54,10 @@ func (db *appdbimpl) GetPost(id string, postid int64) (Post, error) {
 		p.Comments = append(p.Comments, com)
 	}
 
+	imgRaw, err := ioutil.ReadFile(imgPath)
+	if err != nil {
+		return p, err
+	}
+	p.ImageB64 = base64.StdEncoding.EncodeToString(imgRaw)
 	return p, nil
 }

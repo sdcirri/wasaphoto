@@ -17,6 +17,18 @@ func (db *appdbimpl) CommentPost(user string, postID int64, comment string) (int
 	if !exists {
 		return 0, ErrPostNotFound
 	}
+	var op string
+	err = db.c.QueryRow("select author from Posts where postID = ?", postID).Scan(&op)
+	if err != nil {
+		return 0, err
+	}
+	blocked, err := db.IsBlockedBy(user, op)
+	if err != nil {
+		return 0, err
+	}
+	if blocked {
+		return 0, ErrUserIsBlocked
+	}
 	ins, err := db.c.Prepare("insert into Comments values (?, ?, ?, ?) returning commentID")
 	if err != nil {
 		return 0, err

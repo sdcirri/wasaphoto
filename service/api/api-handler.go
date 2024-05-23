@@ -19,6 +19,14 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.PUT("/users/:username/unblock", rt.unblock)
 	rt.router.GET("/followers", rt.getFollowers)
 	rt.router.PUT("/followers/:username/remove", rt.rmFollower)
+	rt.router.GET("/posts/:postID", rt.getPost)
+	rt.router.PUT("/posts/:postID/like", rt.likePost)
+	rt.router.PUT("/posts/:postID/unlike", rt.unlikePost)
+	rt.router.POST("/posts/:postID/comment", rt.commentPost)
+	rt.router.POST("/posts/new", rt.newPost)
+	rt.router.GET("/comments/:commentID", rt.getComment)
+	rt.router.PUT("/comments/:commentID/like", rt.likeComment)
+	rt.router.PUT("/comments/:commentID/unlike", rt.unlikeComment)
 
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)
