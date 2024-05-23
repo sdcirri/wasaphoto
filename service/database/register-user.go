@@ -1,5 +1,7 @@
 package database
 
+import "os"
+
 func (db *appdbimpl) RegisterUser(username string) error {
 	exists, err := db.UserExists(username)
 	if err != nil {
@@ -13,5 +15,12 @@ func (db *appdbimpl) RegisterUser(username string) error {
 		return err
 	}
 	_, err = ins.Exec(username)
+	if err != nil {
+		return errif err != nil {
+		return err
+	}
+	}
+	// Directory to store user data such as profile picture and posted pictures
+	err = os.MkdirAll("/srv/wasaphoto/" + username)
 	return err
 }
