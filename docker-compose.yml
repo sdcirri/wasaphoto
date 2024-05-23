@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./demo:/srv/wasaphoto
+

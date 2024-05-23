@@ -16,11 +16,9 @@ func (db *appdbimpl) RegisterUser(username string) error {
 	}
 	_, err = ins.Exec(username)
 	if err != nil {
-		return errif err != nil {
 		return err
 	}
-	}
 	// Directory to store user data such as profile picture and posted pictures
-	err = os.MkdirAll("/srv/wasaphoto/" + username)
+	err = os.MkdirAll("/srv/wasaphoto/" + username, 0755)
 	return err
 }
