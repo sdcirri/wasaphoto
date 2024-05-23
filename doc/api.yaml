@@ -10,7 +10,7 @@ info:
     url: https://www.gnu.org/licenses/gpl-3.0.en.html
   version: 1.0.0
 servers:
-  - url: "http://localhost:8090/"
+  - url: "http://localhost:3000/"
 tags:
   - name: Account management
   - name: Followers
@@ -307,7 +307,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Post'
+              $ref: '#/components/schemas/PostParams'
       responses:
         '201':
           description: Successful operation
@@ -598,6 +598,16 @@ components:
           format: int64
           minimum: 0
           example: 10
+
+    PostParams:
+      type: object
+      properties:
+        image:
+          type: string
+          description: image encoded in base64
+          format: binary
+        caption:
+          type: string
 
     Like:
       type: string

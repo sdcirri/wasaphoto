@@ -76,6 +76,7 @@ var (
 	ErrNotFollowing      = errors.New("Cannot unfollow user: is not followed")
 	ErrAlreadyFollowing  = errors.New("Error: already following")
 	ErrDidNotLike        = errors.New("Error: user did not like post/comment")
+	ErrBadImage          = errors.New("Error: bad image")
 )
 
 // AppDatabase is the high level interface for the DB
