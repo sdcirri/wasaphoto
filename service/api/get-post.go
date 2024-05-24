@@ -8,6 +8,29 @@ import (
     "strconv"
 )
 
+// Here we don't want to return the likes explicitly, but rather the like count
+type PostFE struct {
+	PostID		int64		`json:"postID"`
+	ImageB64	string		`json:"imageB64"`
+	PubTime		string		`json:"pubTime"`
+	Caption		string		`json:"caption"`
+	Author		string		`json:"author"`
+	LikeCount	int     	`json:"likeCount"`
+	Comments	[]int64		`json:"comments"`
+}
+
+func post2postFE(post database.Post) PostFE {
+    return PostFE {
+        PostID: post.PostID,
+        ImageB64: post.ImageB64,
+        PubTime: post.PubTime,
+        Caption: post.Caption,
+        Author: post.Author,
+        LikeCount: len(post.Likes),
+        Comments: post.Comments,
+    }
+}
+
 func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     idc, err := r.Cookie("WASASESSIONID")
     if err == http.ErrNoCookie {
@@ -34,7 +57,7 @@ func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter
     } else if err != nil {
         http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
     } else {
-        j, err := json.Marshal(post)
+        j, err := json.Marshal(post2postFE(post))
         if err != nil {
             http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
             return

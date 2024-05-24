@@ -36,7 +36,7 @@ func (db *appdbimpl) SetProPic(username string, imgB64 string) error {
     if err != nil {
         return err
     }
-	tran, err := db.c.Prepare("update table Users set propic = ? where username = ?")
+	tran, err := db.c.Prepare("update Users set propic = ? where username = ?")
 	if err != nil {
 		return err
 	}

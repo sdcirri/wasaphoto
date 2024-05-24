@@ -3,6 +3,7 @@ package database
 import (
 	"github.com/sdgondola/wasaphoto/service/globaltime"
 	"encoding/base64"
+	"strconv"
 	"image/jpeg"
 	"image"
 	"bytes"
@@ -27,7 +28,7 @@ func (db *appdbimpl) NewPost(op string, imgB64 string, caption string) (int64, e
     }
 
 	// We first need to insert a stub post in order to get the postID we need for storage
-	ins, err := db.c.Prepare("insert into Posts values (?, ?, ?, ?) returning postID")
+	ins, err := db.c.Prepare("insert into Posts(img_path, pub_time, author, text) values (?, ?, ?, ?)")
 	if err != nil {
 		return 0, err
 	}
@@ -47,7 +48,7 @@ func (db *appdbimpl) NewPost(op string, imgB64 string, caption string) (int64, e
 	if err != nil {
 		return 0, err
 	}
-	imgPath := "/srv/wasaphoto/posts/" + string(postID) + ".jpg"
+	imgPath := "/srv/wasaphoto/posts/" + strconv.FormatInt(postID, 10) + ".jpg"
 	imgFile, err := os.Create(imgPath)
 	if err != nil {
 		return 0, err

@@ -32,11 +32,11 @@ func (rt *_router) likeComment(w http.ResponseWriter, r *http.Request, ps httpro
     if err == database.ErrUserNotFound {
         // This is kinda suspicious, likely a forged cookie
         http.Error(w, "Bad request: hacking attempt?!", http.StatusBadRequest)
-    } else if err == database.ErrPostNotFound {
-        http.Error(w, database.ErrPostNotFound.Error(), http.StatusNotFound)
+    } else if err == database.ErrCommentNotFound {
+        http.Error(w, database.ErrCommentNotFound.Error(), http.StatusNotFound)
     } else if err == database.ErrUserIsBlocked {
         http.Error(w, "Cannot like post: user blocked you!", http.StatusForbidden)
-    } else if err != nil {
+    } else if err != nil && err != database.ErrAlreadyLiked {    // We can safely ignore that as it's likely some duplicate request
         http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
     } else {
         w.WriteHeader(http.StatusCreated)

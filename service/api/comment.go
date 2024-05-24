@@ -33,6 +33,10 @@ func (rt *_router) commentPost(w http.ResponseWriter, r *http.Request, ps httpro
         http.Error(w, "Bad request: empty comment", http.StatusBadRequest)
         return
     }
+    if len(text) > 2048 {
+        http.Error(w, "Bad request: comment too long", http.StatusBadRequest)
+        return
+    }
 
     cID, err := rt.db.CommentPost(id, postID, text)
     if err == database.ErrUserNotFound {

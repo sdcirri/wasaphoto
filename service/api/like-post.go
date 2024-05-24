@@ -36,7 +36,7 @@ func (rt *_router) likePost(w http.ResponseWriter, r *http.Request, ps httproute
         http.Error(w, database.ErrPostNotFound.Error(), http.StatusNotFound)
     } else if err == database.ErrUserIsBlocked {
         http.Error(w, "Cannot like post: user blocked you!", http.StatusForbidden)
-    } else if err != nil {
+    } else if err != nil && err != database.ErrAlreadyLiked {    // We can safely ignore that as it's likely some duplicate request
         http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
     } else {
         w.WriteHeader(http.StatusCreated)

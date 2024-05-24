@@ -25,7 +25,7 @@ func (db *appdbimpl) GetAccount(id string, username string) (Account, error) {
 		return a, ErrUserNotFound
 	}
 
-	err = db.c.QueryRow("select * from Users where username = ?", username).Scan(&a.Username, imgPath)
+	err = db.c.QueryRow("select username, propic from Users where username = ?", username).Scan(&a.Username, &imgPath)
 	if err != nil {
 		return a, err
 	}

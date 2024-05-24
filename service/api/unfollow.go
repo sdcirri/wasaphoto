@@ -34,6 +34,6 @@ func (rt *_router) unfollow(w http.ResponseWriter, r *http.Request, ps httproute
     } else if err != nil {
     	http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
     } else {
-        w.WriteHeader(http.StatusCreated)
+        w.WriteHeader(http.StatusOK)
     }
 }

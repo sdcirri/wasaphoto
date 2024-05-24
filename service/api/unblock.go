@@ -32,6 +32,6 @@ func (rt *_router) unblock(w http.ResponseWriter, r *http.Request, ps httprouter
     } else if err != nil {
     	http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
     } else {
-        w.WriteHeader(http.StatusCreated)
+        w.WriteHeader(http.StatusOK)
     }
 }

@@ -10,7 +10,7 @@ func (db *appdbimpl) RegisterUser(username string) error {
 	if exists {
 		return ErrUserAlreadyExists
 	}
-	ins, err := db.c.Prepare("insert into Users values (?, '/srv/wasaphoto/propic_default.jpg')")
+	ins, err := db.c.Prepare("insert into Users(username) values (?)")
 	if err != nil {
 		return err
 	}

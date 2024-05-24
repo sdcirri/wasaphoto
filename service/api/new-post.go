@@ -34,8 +34,15 @@ func (rt *_router) newPost(w http.ResponseWriter, r *http.Request, ps httprouter
     	http.Error(w, "Bad request: malformed json: " + err.Error(), http.StatusBadRequest)
     	return
     }
+    if len(postParams.Caption) > 2048 {
+        http.Error(w, "Bad request: caption too long", http.StatusBadRequest)
+    	return
+    }
 
     postID, err := rt.db.NewPost(id, postParams.Image, postParams.Caption)
+    if err == database.ErrUserNotFound {
+        http.Error(w, "Bad request: hacking attempt?!", http.StatusBadRequest)
+    }
     if err == database.ErrBadImage {
         http.Error(w, err.Error(), http.StatusBadRequest)
     }

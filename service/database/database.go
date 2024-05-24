@@ -33,6 +33,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"os"
 )
 
 // Data model
@@ -47,7 +48,7 @@ type Account struct {
 type Post struct {
 	PostID		int64		`json:"postID"`
 	ImageB64	string		`json:"imageB64"`
-	PubTime		string		`json:"pub_time"`
+	PubTime		string		`json:"pubTime"`
 	Caption		string		`json:"caption"`
 	Author		string		`json:"author"`
 	Likes		[]string	`json:"likes"`
@@ -60,7 +61,7 @@ type Comment struct {
 	Author		string		`json:"author"`
 	Time		string		`json:"time"`
 	Content		string		`json:"content"`
-	Likes		int64		`json:"likes"`
+	Likes		uint		`json:"likes"`
 }
 
 // Custom errors
@@ -76,6 +77,8 @@ var (
 	ErrAlreadyFollowing  = errors.New("Error: already following")
 	ErrDidNotLike        = errors.New("Error: user did not like post/comment")
 	ErrBadImage          = errors.New("Error: bad image")
+	ErrUserIsNotAuthor   = errors.New("Error: you cannot delete somebody else's post!")
+	ErrAlreadyLiked      = errors.New("Already liked")
 )
 
 // AppDatabase is the high level interface for the DB
@@ -120,6 +123,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
 
+	// Init filesystem structure for DB
+	os.MkdirAll("/srv/wasaphoto/posts", 0755)
+
 	// SQL statements for each table
 	tables := [7]string{
 `create table if not exists Users (
@@ -129,16 +135,16 @@ func New(db *sql.DB) (AppDatabase, error) {
 `create table if not exists Follows (
 	follower	varchar(64),
 	following	varchar(64),
-	foreign key (follower)  references User(login),
-	foreign key (following) references User(login),
+	foreign key (follower)  references User(username),
+	foreign key (following) references User(username),
 	primary key (follower, following),
 	check (follower != following)
 );`,
 `create table if not exists Blocks (
 	blocker varchar(64),
 	blocked varchar(64),
-	foreign key (blocker) references User(login),
-	foreign key (blocked) references User(login),
+	foreign key (blocker) references User(username),
+	foreign key (blocked) references User(username),
 	primary key (blocker, blocked),
 	check (blocker != blocked)
 );`,
@@ -148,7 +154,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	pub_time datetime     not null,
 	author   varchar(64)  not null,
 	text     varchar(2048),
-	foreign key (author) references User(login)
+	foreign key (author) references User(username)
 );`,
 `create table if not exists Comments (
 	commentID integer       primary key autoincrement,
@@ -156,20 +162,20 @@ func New(db *sql.DB) (AppDatabase, error) {
 	author    varchar(64)   not null,
 	post      integer       not null,
 	text      varchar(2048) not null,
-	foreign key (author) references User(login),
+	foreign key (author) references User(username),
 	foreign key (post) references Post(postID)
 );`,
 `create table if not exists LikesP (
 	user varchar(64),
 	post integer,
-	foreign key (user) references User(login),
+	foreign key (user) references User(username),
 	foreign key (post) references Post(postID),
 	primary key (user, post)
 );`,
 `create table if not exists LikesC (
 	user    varchar(64),
 	comment integer,
-	foreign key (user) references User(login),
+	foreign key (user) references User(username),
 	foreign key (comment) references Comment(commentID),
 	primary key (user, comment)
 );`,

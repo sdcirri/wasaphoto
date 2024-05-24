@@ -1,6 +1,9 @@
 package database
 
-import "database/sql"
+import (
+	"github.com/mattn/go-sqlite3"
+	"database/sql"
+)
 
 func (db *appdbimpl) LikeComment(user string, commentID int64) error {
 	exists, err := db.UserExists(user)
@@ -30,5 +33,11 @@ func (db *appdbimpl) LikeComment(user string, commentID int64) error {
 		return err
 	}
 	_, err = ins.Exec(user, commentID)
-	return err
+	if err != nil {
+		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
+			return ErrAlreadyLiked
+		}
+		return err
+	}
+	return nil
 }
