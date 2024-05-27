@@ -38,78 +38,77 @@ import (
 
 // Data model
 type Account struct {
-	Username	string		`json:"username"`
-	ProPicB64	string		`json:"proPicB64"`
-	Followers	uint		`json:"followers"`
-	Following	uint		`json:"following"`
-	Posts		[]int64		`json:"posts"`
+	Username  string  `json:"username"`
+	ProPicB64 string  `json:"proPicB64"`
+	Followers uint    `json:"followers"`
+	Following uint    `json:"following"`
+	Posts     []int64 `json:"posts"`
 }
 
 type Post struct {
-	PostID		int64		`json:"postID"`
-	ImageB64	string		`json:"imageB64"`
-	PubTime		string		`json:"pubTime"`
-	Caption		string		`json:"caption"`
-	Author		string		`json:"author"`
-	Likes		[]string	`json:"likes"`
-	Comments	[]int64		`json:"comments"`
+	PostID   int64    `json:"postID"`
+	ImageB64 string   `json:"imageB64"`
+	PubTime  string   `json:"pubTime"`
+	Caption  string   `json:"caption"`
+	Author   string   `json:"author"`
+	Likes    []string `json:"likes"`
+	Comments []int64  `json:"comments"`
 }
 
 type Comment struct {
-	CommentID	int64		`json:"commentID"`
-	PostID		int64		`json:"postID"`
-	Author		string		`json:"author"`
-	Time		string		`json:"time"`
-	Content		string		`json:"content"`
-	Likes		uint		`json:"likes"`
+	CommentID int64  `json:"commentID"`
+	PostID    int64  `json:"postID"`
+	Author    string `json:"author"`
+	Time      string `json:"time"`
+	Content   string `json:"content"`
+	Likes     uint   `json:"likes"`
 }
 
 // Custom errors
 var (
-	ErrUserNotFound      = errors.New("Error: user does not exist")
-	ErrAlreadyBlocked    = errors.New("Error: user is already blocked")
-	ErrPostNotFound      = errors.New("Error: post does not exist")
-	ErrUserIsBlocked     = errors.New("Error: user is blocked")
-	ErrUserNotBlocked    = errors.New("Error: user is not blocked")
-	ErrCommentNotFound   = errors.New("Error: comment not found")
-	ErrUserAlreadyExists = errors.New("Error: user already exists")
-	ErrNotFollowing      = errors.New("Cannot unfollow user: is not followed")
-	ErrAlreadyFollowing  = errors.New("Error: already following")
-	ErrDidNotLike        = errors.New("Error: user did not like post/comment")
-	ErrBadImage          = errors.New("Error: bad image")
-	ErrUserIsNotAuthor   = errors.New("Error: you cannot delete somebody else's post!")
-	ErrAlreadyLiked      = errors.New("Already liked")
+	ErrUserNotFound      = errors.New("error: user does not exist")
+	ErrAlreadyBlocked    = errors.New("error: user is already blocked")
+	ErrPostNotFound      = errors.New("error: post does not exist")
+	ErrUserIsBlocked     = errors.New("error: user is blocked")
+	ErrUserNotBlocked    = errors.New("error: user is not blocked")
+	ErrCommentNotFound   = errors.New("error: comment not found")
+	ErrUserAlreadyExists = errors.New("error: user already exists")
+	ErrNotFollowing      = errors.New("cannot unfollow user: is not followed")
+	ErrAlreadyFollowing  = errors.New("error: already following")
+	ErrDidNotLike        = errors.New("error: user did not like post/comment")
+	ErrBadImage          = errors.New("error: bad image")
+	ErrUserIsNotAuthor   = errors.New("error: you cannot delete somebody else's post")
+	ErrAlreadyLiked      = errors.New("already liked")
 )
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	UserExists		(login string)								(bool, error)
-	UsersExist		(user1 string, user2 string)				(bool, error)
-	RegisterUser	(username string)							error
-	SetProPic		(username string, imgpath string)			error
-	Follows			(follower string, following string)			(bool, error)
-	Follow			(follower string, toFollow string)			error
-	Unfollow		(follower string, toUnfollow string)		error
-	GetFollowers	(id string)									([]string, error)
-	RmFollower		(user string, follower string)				error
-	Block			(user string, toBlock string) 				error
-	Unblock			(user string, toUnblock string) 			error
-	IsBlockedBy		(blocked string, blocker string)			(bool, error)
-	NewPost			(op string, imgpath string, caption string)	(int64, error)
-	RmPost			(op string, postid int64)					error
-	PostExists		(postID int64)								(bool, error)
-	GetPost			(id string, postid int64)					(Post, error)
-	GetAccount		(id string, username string)				(Account, error)
-	CommentExists	(commentID int64)							(bool, error)
-	GetComment		(commentID int64)							(Comment, error)
-	LikePost		(user string, postID int64)					error
-	UnlikePost		(user string, postID int64)					error
-	CommentPost		(user string, postID int64, comment string)	(int64, error)
-	LikeComment		(user string, commentID int64)				error
-	UnlikeComment	(user string, commentID int64)				error
-	GetFeed			(user string)								([]int64, error)
-	Ping			()											error
-
+	UserExists(login string) (bool, error)
+	UsersExist(user1 string, user2 string) (bool, error)
+	RegisterUser(username string) error
+	SetProPic(username string, imgpath string) error
+	Follows(follower string, following string) (bool, error)
+	Follow(follower string, toFollow string) error
+	Unfollow(follower string, toUnfollow string) error
+	GetFollowers(id string) ([]string, error)
+	RmFollower(user string, follower string) error
+	Block(user string, toBlock string) error
+	Unblock(user string, toUnblock string) error
+	IsBlockedBy(blocked string, blocker string) (bool, error)
+	NewPost(op string, imgpath string, caption string) (int64, error)
+	RmPost(op string, postid int64) error
+	PostExists(postID int64) (bool, error)
+	GetPost(id string, postid int64) (Post, error)
+	GetAccount(id string, username string) (Account, error)
+	CommentExists(commentID int64) (bool, error)
+	GetComment(commentID int64) (Comment, error)
+	LikePost(user string, postID int64) error
+	UnlikePost(user string, postID int64) error
+	CommentPost(user string, postID int64, comment string) (int64, error)
+	LikeComment(user string, commentID int64) error
+	UnlikeComment(user string, commentID int64) error
+	GetFeed(user string) ([]int64, error)
+	Ping() error
 }
 
 type appdbimpl struct {
@@ -128,11 +127,11 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 	// SQL statements for each table
 	tables := [7]string{
-`create table if not exists Users (
+		`create table if not exists Users (
 	username	varchar(64)		primary key,
 	propic		varchar(255)	not null default '/srv/wasaphoto/propic_default.jpg'
 );`,
-`create table if not exists Follows (
+		`create table if not exists Follows (
 	follower	varchar(64),
 	following	varchar(64),
 	foreign key (follower)  references User(username),
@@ -140,7 +139,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	primary key (follower, following),
 	check (follower != following)
 );`,
-`create table if not exists Blocks (
+		`create table if not exists Blocks (
 	blocker varchar(64),
 	blocked varchar(64),
 	foreign key (blocker) references User(username),
@@ -148,7 +147,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	primary key (blocker, blocked),
 	check (blocker != blocked)
 );`,
-`create table if not exists Posts (
+		`create table if not exists Posts (
 	postID   integer      primary key autoincrement,
 	img_path varchar(255) not null,
 	pub_time datetime     not null,
@@ -156,7 +155,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	text     varchar(2048),
 	foreign key (author) references User(username)
 );`,
-`create table if not exists Comments (
+		`create table if not exists Comments (
 	commentID integer       primary key autoincrement,
 	time      datetime      not null,
 	author    varchar(64)   not null,
@@ -165,14 +164,14 @@ func New(db *sql.DB) (AppDatabase, error) {
 	foreign key (author) references User(username),
 	foreign key (post) references Post(postID)
 );`,
-`create table if not exists LikesP (
+		`create table if not exists LikesP (
 	user varchar(64),
 	post integer,
 	foreign key (user) references User(username),
 	foreign key (post) references Post(postID),
 	primary key (user, post)
 );`,
-`create table if not exists LikesC (
+		`create table if not exists LikesC (
 	user    varchar(64),
 	comment integer,
 	foreign key (user) references User(username),

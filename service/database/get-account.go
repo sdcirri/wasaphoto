@@ -1,9 +1,9 @@
 package database
 
 import (
-	"encoding/base64"
 	"database/sql"
-	"io/ioutil"
+	"encoding/base64"
+	"os"
 )
 
 func (db *appdbimpl) GetAccount(id string, username string) (Account, error) {
@@ -57,7 +57,7 @@ func (db *appdbimpl) GetAccount(id string, username string) (Account, error) {
 		a.Posts = append(a.Posts, post)
 	}
 
-	imgRaw, err := ioutil.ReadFile(imgPath)
+	imgRaw, err := os.ReadFile(imgPath)
 	if err != nil {
 		return a, err
 	}

@@ -1,6 +1,9 @@
 package database
 
-import "os"
+import (
+	"os"
+	"strconv"
+)
 
 func (db *appdbimpl) RmPost(op string, post int64) error {
 	exists, err := db.PostExists(post)
@@ -26,6 +29,6 @@ func (db *appdbimpl) RmPost(op string, post int64) error {
 	if err != nil {
 		return err
 	}
-	err = os.Remove("/srv/wasaphoto/posts/" + string(post) + ".jpg")
+	err = os.Remove("/srv/wasaphoto/posts/" + strconv.FormatInt(post, 10) + ".jpg")
 	return err
 }
