@@ -4,11 +4,13 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"os"
+	"strings"
 )
 
 func (db *appdbimpl) GetAccount(id string, username string) (Account, error) {
 	var a Account
 	var imgPath string
+	username = strings.ToLower(username)
 	exists, err := db.UserExists(username)
 	if err != nil {
 		return a, err

@@ -1,16 +1,19 @@
 package database
 
 import (
-	"github.com/sdgondola/wasaphoto/service/globaltime"
-	"encoding/base64"
-	"strconv"
-	"image/jpeg"
-	"image"
 	"bytes"
+	"encoding/base64"
+	"image"
+	"image/jpeg"
 	"os"
+	"strconv"
+	"strings"
+
+	"github.com/sdgondola/wasaphoto/service/globaltime"
 )
 
 func (db *appdbimpl) NewPost(op string, imgB64 string, caption string) (int64, error) {
+	op = strings.ToLower(op)
 	exists, err := db.UserExists(op)
 	if err != nil {
 		return 0, err
@@ -19,13 +22,13 @@ func (db *appdbimpl) NewPost(op string, imgB64 string, caption string) (int64, e
 		return 0, ErrUserNotFound
 	}
 	rawImg, err := base64.StdEncoding.DecodeString(imgB64)
-    if err != nil {
-    	return 0, err
-    }
-    img, _, err := image.Decode(bytes.NewReader(rawImg))
-    if err != nil {
-        return 0, ErrBadImage
-    }
+	if err != nil {
+		return 0, err
+	}
+	img, _, err := image.Decode(bytes.NewReader(rawImg))
+	if err != nil {
+		return 0, ErrBadImage
+	}
 
 	// We first need to insert a stub post in order to get the postID we need for storage
 	ins, err := db.c.Prepare("insert into Posts(img_path, pub_time, author, text) values (?, ?, ?, ?)")

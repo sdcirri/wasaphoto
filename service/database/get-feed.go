@@ -1,8 +1,12 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"strings"
+)
 
 func (db *appdbimpl) GetFeed(user string) ([]int64, error) {
+	user = strings.ToLower(user)
 	feed := make([]int64, 0)
 	exists, err := db.UserExists(user)
 	if err != nil {

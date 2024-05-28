@@ -1,8 +1,12 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"strings"
+)
 
 func (db *appdbimpl) UserExists(login string) (bool, error) {
+	login = strings.ToLower(login)
 	var ok bool
 	err := db.c.QueryRow("select exists(select 1 from Users where username = ?)", login).Scan(&ok)
 	if err == sql.ErrNoRows {

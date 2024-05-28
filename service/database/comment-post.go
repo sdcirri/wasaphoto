@@ -1,8 +1,13 @@
 package database
 
-import "github.com/sdgondola/wasaphoto/service/globaltime"
+import (
+	"strings"
+
+	"github.com/sdgondola/wasaphoto/service/globaltime"
+)
 
 func (db *appdbimpl) CommentPost(user string, postID int64, comment string) (int64, error) {
+	user = strings.ToLower(user)
 	exists, err := db.UserExists(user)
 	if err != nil {
 		return 0, err

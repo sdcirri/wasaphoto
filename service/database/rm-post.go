@@ -3,9 +3,11 @@ package database
 import (
 	"os"
 	"strconv"
+	"strings"
 )
 
 func (db *appdbimpl) RmPost(op string, post int64) error {
+	op = strings.ToLower(op)
 	exists, err := db.PostExists(post)
 	if err != nil {
 		return err

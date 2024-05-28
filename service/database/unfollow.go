@@ -1,11 +1,15 @@
 package database
 
+import "strings"
+
 func (db *appdbimpl) Unfollow(follower string, toUnfollow string) error {
+	follower = strings.ToLower(follower)
+	toUnfollow = strings.ToLower(toUnfollow)
 	exist, err := db.UsersExist(follower, toUnfollow)
 	if err != nil {
 		return err
 	}
-	if ! exist {
+	if !exist {
 		return ErrUserNotFound
 	}
 	follows, err := db.Follows(follower, toUnfollow)

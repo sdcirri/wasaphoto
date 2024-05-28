@@ -1,10 +1,13 @@
 package database
 
 import (
+	"strings"
+
 	"github.com/mattn/go-sqlite3"
 )
 
 func (db *appdbimpl) LikePost(user string, postID int64) error {
+	user = strings.ToLower(user)
 	exists, err := db.UserExists(user)
 	if err != nil {
 		return err

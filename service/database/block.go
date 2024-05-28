@@ -1,6 +1,10 @@
 package database
 
+import "strings"
+
 func (db *appdbimpl) Block(user string, toBlock string) error {
+	user = strings.ToLower(user)
+	toBlock = strings.ToLower(toBlock)
 	exist, err := db.UsersExist(user, toBlock)
 	if err != nil {
 		return err

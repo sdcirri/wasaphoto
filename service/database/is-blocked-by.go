@@ -1,8 +1,13 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"strings"
+)
 
 func (db *appdbimpl) IsBlockedBy(blocked string, blocker string) (bool, error) {
+	blocked = strings.ToLower(blocked)
+	blocker = strings.ToLower(blocker)
 	exist, err := db.UsersExist(blocked, blocker)
 	if err != nil {
 		return false, err

@@ -1,14 +1,16 @@
 package database
 
 import (
-	"encoding/base64"
-	"image/jpeg"
-	"image"
 	"bytes"
+	"encoding/base64"
+	"image"
+	"image/jpeg"
 	"os"
+	"strings"
 )
 
 func (db *appdbimpl) SetProPic(username string, imgB64 string) error {
+	username = strings.ToLower(username)
 	exists, err := db.UserExists(username)
 	if err != nil {
 		return err
@@ -17,25 +19,25 @@ func (db *appdbimpl) SetProPic(username string, imgB64 string) error {
 		return ErrUserNotFound
 	}
 	rawImg, err := base64.StdEncoding.DecodeString(imgB64)
-    if err != nil {
-    	return err
-    }
-    img, _, err := image.Decode(bytes.NewReader(rawImg))
-    if err != nil {
-        return ErrBadImage
-    }
+	if err != nil {
+		return err
+	}
+	img, _, err := image.Decode(bytes.NewReader(rawImg))
+	if err != nil {
+		return ErrBadImage
+	}
 	dstPath := "/srv/wasaphoto/" + username + "/propic.jpg"
 	dst, err := os.Create(dstPath)
 	if err != nil {
-        return err
-    }
+		return err
+	}
 	defer dst.Close()
 
-    jpegOptions := &jpeg.Options{Quality: 85}
-    err = jpeg.Encode(dst, img, jpegOptions)
-    if err != nil {
-        return err
-    }
+	jpegOptions := &jpeg.Options{Quality: 85}
+	err = jpeg.Encode(dst, img, jpegOptions)
+	if err != nil {
+		return err
+	}
 	tran, err := db.c.Prepare("update Users set propic = ? where username = ?")
 	if err != nil {
 		return err

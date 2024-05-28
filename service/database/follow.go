@@ -1,6 +1,10 @@
 package database
 
+import "strings"
+
 func (db *appdbimpl) Follow(follower string, toFollow string) error {
+	follower = strings.ToLower(follower)
+	toFollow = strings.ToLower(toFollow)
 	exist, err := db.UsersExist(follower, toFollow)
 	if err != nil {
 		return err
