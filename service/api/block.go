@@ -1,37 +1,47 @@
 package api
 
 import (
-    "github.com/sdgondola/wasaphoto/service/database"
-	"github.com/julienschmidt/httprouter"
+	"errors"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/sdgondola/wasaphoto/service/database"
 )
 
 func (rt *_router) block(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-    id, err := r.Cookie("WASASESSIONID")
-    if err == http.ErrNoCookie {
-        http.Error(w, "Unauthenticated", http.StatusUnauthorized)
-        return
-    } else if err != nil {
-    	http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
-    	return
-    }
-    toBlock := ps.ByName("username")
-    if toBlock == "" {
-        http.Error(w, "Bad request: no username provided", http.StatusBadRequest)
-        return
-    }
-    if toBlock == id.Value {
-        http.Error(w, "Bad request: you cannot block yourself!", http.StatusBadRequest)
-        return
-    }
-    err = rt.db.Block(id.Value, toBlock)
-    if err == database.ErrUserNotFound {
-        http.Error(w, "Bad request: no such user", http.StatusBadRequest)
-    } else if err == database.ErrAlreadyBlocked {
-        http.Error(w, "Bad request: user already blocked", http.StatusBadRequest)
-    } else if err != nil {
-    	http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
-    } else {
-        w.WriteHeader(http.StatusCreated)
-    }
+	token, err := rt.getAuthToken(r)
+	if errors.Is(err, ErrNoAuth) {
+		http.Error(w, "Unauthenticated", http.StatusUnauthorized)
+		return
+	} else if errors.Is(err, database.ErrUserNotFound) {
+		http.Error(w, "Bad authentication token", http.StatusBadRequest)
+		return
+	} else if err != nil {
+		rt.internalServerError(err, w)
+		return
+	}
+	toBlock := ps.ByName("username")
+	if toBlock == "" {
+		http.Error(w, "Bad request: no username provided", http.StatusBadRequest)
+		return
+	}
+	if toBlock == token {
+		http.Error(w, "Bad request: you cannot block yourself!", http.StatusBadRequest)
+		return
+	}
+	err = rt.db.Block(token, toBlock)
+	if errors.Is(err, database.ErrUserNotFound) {
+		http.Error(w, "Error: user not found", http.StatusNotFound)
+	} else if errors.Is(err, database.ErrAlreadyBlocked) {
+		http.Error(w, "Bad request: user already blocked", http.StatusBadRequest)
+	} else if err != nil {
+		rt.internalServerError(err, w)
+	} else {
+		w.WriteHeader(http.StatusCreated)
+		w.Header().Set("content-type", "text/plain")
+		_, err = w.Write([]byte(toBlock))
+		if err != nil {
+			rt.internalServerError(err, w)
+		}
+	}
 }

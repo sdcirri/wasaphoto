@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"io"
 	"net/http"
 
@@ -9,30 +10,42 @@ import (
 )
 
 func (rt *_router) setProPic(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	id, err := r.Cookie("WASASESSIONID")
-	if err == http.ErrNoCookie {
-		http.Error(w, "Unauthenticated", http.StatusUnauthorized)
+	token, err := rt.getAuthToken(r)
+	if errors.Is(err, database.ErrUserNotFound) {
+		http.Error(w, "Error: bad authentication token", http.StatusBadRequest)
+		return
+	} else if errors.Is(err, ErrNoAuth) {
+		http.Error(w, "Error: no auth token provided", http.StatusUnauthorized)
 		return
 	} else if err != nil {
-		http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
+		rt.internalServerError(err, w)
+		return
+	}
+	username := ps.ByName("userID")
+	if username != token {
+		http.Error(w, "Error: you cannot set somebody else's profile picture", http.StatusForbidden)
 		return
 	}
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
+		rt.internalServerError(err, w)
 		return
 	}
-	err = rt.db.SetProPic(id.Value, string(body[:]))
-	if err == database.ErrUserNotFound {
+	err = rt.db.SetProPic(username, string(body[:]))
+	if errors.Is(err, database.ErrUserNotFound) {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
-	} else if err == database.ErrBadImage {
+	} else if errors.Is(err, database.ErrBadImage) {
 		http.Error(w, "Bad image", http.StatusBadRequest)
 		return
 	} else if err != nil {
-		http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
+		rt.internalServerError(err, w)
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("content-type", "text/plain")
+	_, err = w.Write([]byte(username))
+	if err != nil {
+		rt.internalServerError(err, w)
+	}
 }

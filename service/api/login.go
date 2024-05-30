@@ -1,52 +1,43 @@
 package api
 
 import (
-	"github.com/julienschmidt/httprouter"
+	"errors"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/sdgondola/wasaphoto/service/database"
 )
 
 func (rt *_router) login(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// First check if the user is already logged in
-	id, err := r.Cookie("WASASESSIONID")
-	if err == http.ErrNoCookie {
-		// If not, let's check the ID in the query
-		username := r.URL.Query().Get("username")
-		if username == "" {
-			http.Error(w, "Bad request: username must be provided", http.StatusBadRequest)
+	username, err := rt.getAuthToken(r)
+	if errors.Is(err, ErrNoAuth) {
+		http.Error(w, "Bad request: no auth token provided", http.StatusBadRequest)
+		return
+	} else if errors.Is(err, database.ErrUserNotFound) {
+		if len(username) < 3 || len(username) > 127 {
+			http.Error(w, "Invalid username, usernames should be between 3 and 127 characters long", http.StatusBadRequest)
 			return
 		}
-		exists, err := rt.db.UserExists(username)
+		err = rt.db.RegisterUser(username)
 		if err != nil {
-			http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
+			rt.internalServerError(err, w)
 			return
 		}
-		if !exists {
-			http.Error(w, "User not found", http.StatusNotFound)
-			return
-		}
-		http.SetCookie(w, &http.Cookie{
-			Name: "WASASESSIONID",
-			Value: username,
-			Path: "/",
-		})
-		w.WriteHeader(http.StatusOK)
-		return
+		w.WriteHeader(http.StatusCreated)
 	} else if err != nil {
-    	http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
-    	return
-	}
-
-	// Check if cookie is not valid
-	exists, err := rt.db.UserExists(id.Value)
-	if err != nil {
-    	http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
-    	return
-	}
-	if !exists {
-		// This is kinda suspicious, likely a forged cookie
-		http.Error(w, "Bad request: hacking attempt?!", http.StatusBadRequest)
+		rt.internalServerError(err, w)
 		return
 	}
-
-	// Cookie is already present and valid, we don't need to do anything
+	http.SetCookie(w, &http.Cookie{
+		Name:  "WASASESSIONID",
+		Value: username,
+		Path:  "/",
+	})
+	w.Header().Set("content-type", "text-plain")
+	_, err = w.Write([]byte(username))
+	if err != nil {
+		rt.internalServerError(err, w)
+		return
+	}
 }

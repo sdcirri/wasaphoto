@@ -11,7 +11,7 @@ info:
     url: https://www.gnu.org/licenses/gpl-3.0.en.html
   version: 1.0.0
 servers:
-  - url: "http://localhost:3000/"
+  - url: "http://localhost:3000"
 tags:
   - name: Account management
   - name: Followers
@@ -24,13 +24,14 @@ paths:
       tags:
         - Account management
       summary: Login
-      description: Logs in the user
+      description: Logs in the user, if it doesn't exist, registers the user
       operationId: login
       parameters:
         - in: query
           name: username
+          description: Login username
           schema:
-            type: string
+            $ref: '#/components/schemas/Username'
           required: true
       responses:
         '200':
@@ -40,54 +41,39 @@ paths:
               schema:
                 type: string
                 example: WASASESSIONID=user123; Path=/; HttpOnly
-        '400':
-          description: Invalid username
-        '404':
-          description: User not found
-
-  /register:
-    post:
-      tags:
-        - Account management
-      summary: Register a new user
-      description: |-
-        Registers a new user with the supplied username, also returns a cookie with the relative sessionID,
-        effectively authenticating the user
-      operationId: register
-      parameters:
-        - in: query
-          name: username
-          schema:
-            type: string
-          required: true
-      responses:
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Username'
         '201':
-          description: Successful operation
+          description: User registered
           headers:
             Set-Cookie:
               schema:
                 type: string
                 example: WASASESSIONID=user123; Path=/; HttpOnly
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Username'
         '400':
-          description: An empty username was provided
-        '403':
-          description: Username already taken
+          description: Invalid username, usernames should be between 3 and 127 characters long
 
-  /setPP:
+  /{userID}/setPP:
     put:
       tags:
         - Account management
       summary: Set a profile picture
       description: |-
         Sets the profile picture for the logged in user, the picture should be provided in
-        the request body in base64 encoding
+        the request body in base64 encoding. Returns your user ID on success
       operationId: setPP
       parameters:
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
+        - in: path
+          name: userID
+          description: Your user ID (login name)
           schema:
-            type: string
+            $ref: '#/components/schemas/Username'
           required: true
       requestBody:
         content:
@@ -98,24 +84,33 @@ paths:
       responses:
         '201':
           description: Operation successful
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Username'
         '400':
           description: Bad image
         '401':
           description: Unauthenticated
+        '403':
+          description: You cannot set somebody else's profile picture
 
   /users/{username}:
     get:
       tags:
         - Feed tools
       summary: Profile info
-      description: Returns information about a user (follower count, following count, profile picture (B64-encoded!) and posts)
-      operationId: getAccount
+      description: |-
+        Returns information about a user (follower count, following count, profile picture (B64-encoded!) and posts)
+        You need to be logged in (provide a valid auth token) in order to view posts. Otherwise, the 'posts' property
+        will be empty
+      operationId: getProfile
       parameters:
         - in: path
           name: username
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/Username'
       responses:
         '200':
           description: Operation successful
@@ -124,39 +119,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/Account'
         '400':
-          description: Bad cookie
-        '401':
-          description: Unauthenticated
+          description: Bad auth token
         '403':
           description: 'Forbidden: user blocked you!'
         '404':
           description: User not found
 
-  /users/{username}/follow:
+  /{userID}/follow/{username}:
     put:
       tags:
         - Followers
       summary: Follow user
-      description: Follows a user
+      description: Follows a user. On success returns the followed user's ID
       operationId: follow
       parameters:
+        - in: path
+          name: userID
+          description: Your username
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
         - in: path
           name: username
           description: User to follow
           required: true
           schema:
-            type: string
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          schema:
-            type: string
+            $ref: '#/components/schemas/Username'
       responses:
         '201':
           description: Successful operation
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Username'
         '400':
-          description: Already following
+          description: bad auth token, already following or trying to follow yourself
         '401':
           description: Unauthenticated
         '403':
@@ -164,7 +161,7 @@ paths:
         '404':
           description: User not found
 
-  /users/{username}/unfollow:
+  /{userID}/unfollow/{username}:
     delete:
       tags:
         - Followers
@@ -173,58 +170,63 @@ paths:
       operationId: unfollow
       parameters:
         - in: path
+          name: userID
+          description: Your username
+          required: true
+          $ref: '#/components/schemas/Username'
+        - in: path
           name: username
           description: User to unfollow
           required: true
           schema:
             type: string
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          schema:
-            type: string
       responses:
-        '200':
+        '204':
           description: successful operation
         '400':
-          description: Not following
+          description: Bad auth token, not following or trying to unfollow yourself
         '401':
           description: Unauthenticated
         '404':
           description: User not found or not following
 
-  /{username}/block:
+  /{userID}/block/{username}:
     put:
       tags:
         - Followers
       summary: Block user
-      description: Blocks annoying user
+      description: |-
+        Blocks annoying user. On success returns the blocked user's ID.
+        Also removes the user from your followers
       operationId: block
       parameters:
+        - in: path
+          name: userID
+          description: Your username
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
         - in: path
           name: username
           description: User to block
           required: true
           schema:
-            type: string
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          schema:
-            type: string
+            $ref: '#/components/schemas/Username'
       responses:
         '201':
           description: Successful operation
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Username'
         '400':
-          description: Already blocked
+          description: Bad auth token, already blocked or trying to block yourself
         '401':
           description: Unauthenticated
         '404':
           description: User not found
 
-  /{username}/unblock:
+  /{userID}/unblock/{username}:
     delete:
       tags:
         - Followers
@@ -233,28 +235,26 @@ paths:
       operationId: unblock
       parameters:
         - in: path
+          name: userID
+          description: Your username
+          required: true
+          $ref: '#/components/schemas/Username'
+        - in: path
           name: username
           description: User to unblock
           required: true
-          schema:
-            type: string
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          schema:
-            type: string
+          $ref: '#/components/schemas/Username'
       responses:
-        '200':
+        '204':
           description: Successful operation
         '400':
-          description: Not blocked
+          description: Bad auth token, not blocked or trying to unblock yourself
         '401':
           description: Unauthenticated
         '404':
-          description: User not found or not blocked
+          description: User not found
 
-  /followers:
+  /{userID}/followers:
     get:
       tags:
         - Followers
@@ -262,21 +262,28 @@ paths:
       description: See who is following you
       operationId: getFollowers
       parameters:
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
+        - in: path
+          name: userID
+          description: Your username
           required: true
-          schema:
-            type: string
+          $ref: '#/components/schemas/Username'
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ID'
         '400':
-          description: Bad cookie
+          description: Bad auth token
         '401':
           description: Unauthenticated
+        '403':
+          description: "Forbidden: cannot view somebody else's followers"
 
-  /followers/{username}/remove:
+  /{userID}/followers/{username}/remove:
     delete:
       tags:
         - Followers
@@ -285,41 +292,44 @@ paths:
       operationId: removeFollower
       parameters:
         - in: path
+          name: userID
+          description: Your username
+          required: true
+          $ref: '#/components/schemas/Username'
+        - in: path
           name: username
           description: Follower to remove
           required: true
           schema:
             type: string
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          schema:
-            type: string
       responses:
-        '200':
+        '204':
           description: Successful operation
         '400':
-          description: Bad cookie
+          description: Bad auth token or trying to remove yourself
         '401':
           description: Unauthenticated
         '404':
           description: User not found or not following
 
-  /newpost:
+  /{userID}/newpost:
     post:
       tags:
         - Post tools
       summary: New post
-      description: Creates a new post with the supplied image and, optionally, a description
+      description: Creates a new post with the supplied image and, optionally, a description. On success returns the post info
       operationId: newPost
       parameters:
+        - in: path
+          name: userID
+          description: Your username
+          required: true
+          $ref: '#/components/schemas/Username'
         - in: cookie
           name: WASASESSIONID
           description: Your session cookie
           required: true
-          schema:
-            type: string
+          $ref: '#/components/schemas/Username'
       requestBody:
         content:
           application/json:
@@ -328,6 +338,10 @@ paths:
       responses:
         '201':
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
         '400':
           description: Bad cookie, malformed JSON or caption too long
         '401':
@@ -345,15 +359,13 @@ paths:
           name: WASASESSIONID
           description: Your session cookie
           required: true
-          schema:
-            type: string
+          $ref: '#/components/schemas/Username'
         - in: path
           name: postID
           required: true
-          schema:
-            type: string
+          $ref: '#/components/schemas/ID'
       responses:
-        '200':
+        '204':
           description: Operation successful
         '401':
           description: Unauthenticated
@@ -374,7 +386,7 @@ paths:
           name: postID
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ID'
       responses:
         '200':
           description: Operation successful
@@ -404,12 +416,12 @@ paths:
           description: Your session cookie
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/Username'
         - in: path
           name: postID
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ID'
       responses:
         '200':
           description: Operation successful
@@ -426,7 +438,7 @@ paths:
         '404':
           description: Post not found
 
-  /feed:
+  /{userID}/feed:
     get:
       tags:
         - Feed tools
@@ -434,12 +446,18 @@ paths:
       description: Retrieves your feed made of the posts of the accounts you follow in reverse chronological order
       operationId: getFeed
       parameters:
+        - in: path
+          name: userID
+          description: Your username
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
         - in: cookie
           name: WASASESSIONID
           description: Your session cookie
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/Username'
       responses:
         '200':
           description: Operation successful
@@ -450,12 +468,12 @@ paths:
         '401':
           description: Unauthenticated
 
-  /posts/{postID}/like:
+  /{userID}/posts/{postID}/like:
     put:
       tags:
         - Feed tools
       summary: Like a post
-      description: Likes a post
+      description: Adds a like as the logged user. On success returns the new like count
       operationId: likePost
       parameters:
         - in: cookie
@@ -463,15 +481,25 @@ paths:
           description: Your session cookie
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/Username'
+        - in: path
+          name: userID
+          description: Your username
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
         - in: path
           name: postID
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ID'
       responses:
         '201':
           description: Operation successful
+          content:
+            text/plain:
+              schema:
+                type: integer
         '400':
           description: Bad cookie
         '401':
@@ -481,12 +509,12 @@ paths:
         '404':
           description: Post not found
 
-  /posts/{postID}/unlike:
-    put:
+  /{userID}/posts/{postID}/unlike:
+    delete:
       tags:
         - Feed tools
       summary: Unlikes a post
-      description: Unlikes a post
+      description: Removes the like as the logged user (if any). On success returns the new like count
       operationId: unlikePost
       parameters:
         - in: cookie
@@ -496,13 +524,23 @@ paths:
           schema:
             type: string
         - in: path
+          name: userID
+          description: Your username
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+        - in: path
           name: postID
           required: true
           schema:
             type: string
       responses:
-        '200':
+        '204':
           description: Operation successful
+          content:
+            text/plain:
+              schema:
+                type: integer
         '400':
           description: Bad cookie or post wasn't liked
         '401':
@@ -510,12 +548,12 @@ paths:
         '404':
           description: Post not found
 
-  /posts/{postID}/comment:
+  /{userID}/posts/{postID}/comment:
     post:
       tags:
         - Feed tools
       summary: Comment on a post
-      description: Comments on a post
+      description: Comments on a post. On success returns the new comment
       operationId: commentPost
       requestBody:
         content:
@@ -523,6 +561,12 @@ paths:
             schema:
               type: string
       parameters:
+        - in: path
+          name: userID
+          description: Your username
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
         - in: cookie
           name: WASASESSIONID
           description: Your session cookie
@@ -537,6 +581,10 @@ paths:
       responses:
         '201':
           description: Operation successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
         '400':
           description: Bad cookie, empty comment or comment too long
         '401':
@@ -546,14 +594,20 @@ paths:
         '404':
           description: Post not found
 
-  /comments/{commentID}/like:
+  /{userID}/comments/{commentID}/like:
     put:
       tags:
         - Feed tools
-      summary: Like a comment
-      description: Likes a comment
+      summary: Likes a comment
+      description: Adds a like to a comment as the logged user. On success returns the new like count
       operationId: likeComment
       parameters:
+        - in: path
+          name: userID
+          description: Your username
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
         - in: cookie
           name: WASASESSIONID
           description: Your session cookie
@@ -568,6 +622,10 @@ paths:
       responses:
         '201':
           description: Operation successful
+          content:
+            text/plain:
+              schema:
+                type: integer
         '400':
           description: Bad cookie
         '401':
@@ -577,14 +635,20 @@ paths:
         '404':
           description: Comment not found
 
-  /comments/{commentID}/unlike:
+  /{postID}/comments/{commentID}/unlike:
     delete:
       tags:
         - Feed tools
-      summary: Unlike a post
-      description: Unlikes a post from your feed
+      summary: Unlike a comment
+      description: Removes the like from a comment as the logged user (if any). On success returns the new like count
       operationId: unlikeComment
       parameters:
+        - in: path
+          name: userID
+          description: Your username
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
         - in: cookie
           name: WASASESSIONID
           description: Your session cookie
@@ -597,8 +661,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        '204':
           description: Operation successful
+          content:
+            text/plain:
+              schema:
+                type: integer
         '400':
           description: Bad cookie or comment wasn't liked
         '401':
@@ -607,18 +675,29 @@ paths:
           description: Comment not found
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
   schemas:
     ID:
       type: integer
       format: int64
       minimum: 0
       example: 32156
+
+    Username:
+      type: string
+      minLength: 3
+      maxLength: 127
+      example: user123
+
     Account:
       type: object
       properties:
         username:
-          type: string
-          example: user123
+          $ref: '#/components/schemas/Username'
         proPicB64:
           type: string
           format: binary
@@ -636,6 +715,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ID'
+  
     Post:
       type: object
       properties:
@@ -645,8 +725,7 @@ components:
           minimum: 0
           example: 32457
         author:
-          type: string
-          example: user123
+          $ref: '#/components/schemas/Username'
         pubTime:
           type: string
           example: 2024-05-24T15:00:00
@@ -677,14 +756,10 @@ components:
         caption:
           type: string
 
-    Like:
-      type: string
-      example: user123
-
     LikeList:
       type: array
       items:
-        $ref: '#/components/schemas/Like'
+        $ref: '#/components/schemas/Username'
 
     Comment:
       type: object
@@ -692,8 +767,7 @@ components:
         id:
           $ref: '#/components/schemas/ID'
         author:
-          type: string
-          example: user123
+          $ref: '#/components/schemas/Username'
         likes:
           type: integer
           format: int64
@@ -712,3 +786,6 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ID'
+
+security:
+  - bearerAuth: []
