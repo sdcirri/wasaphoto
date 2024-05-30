@@ -8,5 +8,5 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./demo:/srv/wasaphoto
-
+      - './data/conf:/etc/wasaphoto'
+      - './data/db:/srv/wasaphoto'

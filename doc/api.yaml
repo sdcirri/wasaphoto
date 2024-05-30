@@ -59,7 +59,7 @@ paths:
         '400':
           description: Invalid username, usernames should be between 3 and 127 characters long
 
-  /{userID}/setPP:
+  /setPP/{userID}:
     put:
       tags:
         - Account management
@@ -67,7 +67,7 @@ paths:
       description: |-
         Sets the profile picture for the logged in user, the picture should be provided in
         the request body in base64 encoding. Returns your user ID on success
-      operationId: setPP
+      operationId: setProPic
       parameters:
         - in: path
           name: userID
@@ -95,7 +95,7 @@ paths:
         '403':
           description: You cannot set somebody else's profile picture
 
-  /users/{username}:
+  /users/{userID}:
     get:
       tags:
         - Feed tools
@@ -107,7 +107,7 @@ paths:
       operationId: getProfile
       parameters:
         - in: path
-          name: username
+          name: userID
           required: true
           schema:
             $ref: '#/components/schemas/Username'
@@ -125,7 +125,7 @@ paths:
         '404':
           description: User not found
 
-  /{userID}/follow/{username}:
+  /users/{userID}/follow/{username}:
     put:
       tags:
         - Followers
@@ -161,7 +161,7 @@ paths:
         '404':
           description: User not found
 
-  /{userID}/unfollow/{username}:
+  /users/{userID}/unfollow/{username}:
     delete:
       tags:
         - Followers
@@ -190,7 +190,7 @@ paths:
         '404':
           description: User not found or not following
 
-  /{userID}/block/{username}:
+  /users/{userID}/block/{username}:
     put:
       tags:
         - Followers
@@ -226,7 +226,7 @@ paths:
         '404':
           description: User not found
 
-  /{userID}/unblock/{username}:
+  /users/{userID}/unblock/{username}:
     delete:
       tags:
         - Followers
@@ -254,7 +254,7 @@ paths:
         '404':
           description: User not found
 
-  /{userID}/followers:
+  /users/{userID}/followers:
     get:
       tags:
         - Followers
@@ -283,7 +283,7 @@ paths:
         '403':
           description: "Forbidden: cannot view somebody else's followers"
 
-  /{userID}/followers/{username}/remove:
+  /users/{userID}/followers/{username}/remove:
     delete:
       tags:
         - Followers
@@ -314,7 +314,7 @@ paths:
         '404':
           description: User not found or not following
 
-  /{userID}/newpost:
+  /users/{userID}/newpost:
     post:
       tags:
         - Post tools
@@ -432,7 +432,7 @@ paths:
         '404':
           description: Post not found
 
-  /{userID}/feed:
+  /feed/{userID}:
     get:
       tags:
         - Feed tools
@@ -460,7 +460,7 @@ paths:
         '403':
           description: Trying to view somebody else's feed
 
-  /{userID}/posts/{postID}/like:
+  /posts/{postID}/like/{userID}:
     put:
       tags:
         - Feed tools
@@ -495,7 +495,7 @@ paths:
         '404':
           description: Post not found
 
-  /{userID}/posts/{postID}/unlike:
+  /posts/{postID}/unlike/{userID}:
     delete:
       tags:
         - Feed tools
@@ -528,7 +528,7 @@ paths:
         '404':
           description: Post not found
 
-  /{userID}/posts/{postID}/comment:
+  /posts/{postID}/comment/{userID}:
     post:
       tags:
         - Feed tools
@@ -568,7 +568,7 @@ paths:
         '404':
           description: Post not found
 
-  /{userID}/comments/{commentID}/like:
+  /comments/{commentID}/like/{userID}:
     put:
       tags:
         - Feed tools
@@ -603,7 +603,7 @@ paths:
         '404':
           description: Comment not found
 
-  /{postID}/comments/{commentID}/unlike:
+  /comments/{commentID}/unlike/{userID}:
     delete:
       tags:
         - Feed tools
@@ -636,7 +636,7 @@ paths:
         '404':
           description: Comment not found
 
-  /{userID}/comments/{commentID}/delete:
+  /comments/{commentID}/delete/{userID}:
     delete:
       tags:
         - Feed tools

@@ -33,6 +33,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"os"
 )
 
 // Data model
@@ -118,9 +119,13 @@ type appdbimpl struct {
 
 // New returns a new instance of AppDatabase based on the SQLite connection `db`.
 // `db` is required - an error will be returned if `db` is `nil`.
-func New(db *sql.DB) (AppDatabase, error) {
+func New(db *sql.DB, installRoot string) (AppDatabase, error) {
 	if db == nil {
 		return nil, errors.New("database is required when building a AppDatabase")
+	}
+	_, err := os.Stat(installRoot)
+	if err != nil {
+		return nil, errors.New("a valid installation path is required when building a database")
 	}
 
 	// SQL statements for each table
@@ -181,7 +186,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 	migration, err := db.Begin()
 	if err != nil {
 		return &appdbimpl{
-			c: db,
+			c:           db,
+			installRoot: installRoot,
 		}, err
 	}
 
@@ -191,7 +197,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 		if err != nil {
 			migration.Rollback()
 			return &appdbimpl{
-				c: db,
+				c:           db,
+				installRoot: installRoot,
 			}, err
 		}
 	}
@@ -201,12 +208,14 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if err != nil {
 		migration.Rollback()
 		return &appdbimpl{
-			c: db,
+			c:           db,
+			installRoot: installRoot,
 		}, err
 	}
 
 	return &appdbimpl{
-		c: db,
+		c:           db,
+		installRoot: installRoot,
 	}, nil
 }
 

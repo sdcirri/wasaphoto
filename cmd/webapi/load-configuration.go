@@ -15,7 +15,7 @@ import (
 // loadConfiguration and values from flags, environment variable or configuration file will be loaded.
 type WebAPIConfiguration struct {
 	Config struct {
-		Path string `conf:"default:/srv/wasaphoto/config.yml"`
+		Path string `conf:"default:/etc/wasaphoto/config.yml"`
 	}
 	Web struct {
 		APIHost         string        `conf:"default:0.0.0.0:3000"`

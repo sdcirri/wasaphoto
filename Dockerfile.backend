@@ -18,7 +18,7 @@ WORKDIR /app/
 COPY --from=builder /app/webapi ./
 
 RUN mkdir /srv/wasaphoto
+RUN mkdir /etc/wasaphoto
 
 ### Executable command
 CMD ["/app/webapi"]
-

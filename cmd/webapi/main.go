@@ -120,7 +120,7 @@ func run() error {
 		logger.Debug("database stopping")
 		_ = dbconn.Close()
 	}()
-	db, err := database.New(dbconn)
+	db, err := database.New(dbconn, cfg.DB.InstallRoot)
 	if err != nil {
 		logger.WithError(err).Error("error creating AppDatabase")
 		return fmt.Errorf("creating AppDatabase: %w", err)
