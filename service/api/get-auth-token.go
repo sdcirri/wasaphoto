@@ -11,10 +11,11 @@ import (
 var ErrNoAuth = errors.New("unauthenticated")
 
 func (rt *_router) getAuthToken(r *http.Request) (string, error) {
-	token := strings.Split(r.Header.Get("Authorization"), "Bearer")[1]
-	if token == "" {
-		return token, ErrNoAuth
+	tokenSplit := strings.Split(r.Header.Get("Authorization"), "Bearer")
+	if len(tokenSplit) < 2 {
+		return "", ErrNoAuth
 	}
+	token := tokenSplit[1]
 	valid, err := rt.db.UserExists(token)
 	if err != nil {
 		return token, err

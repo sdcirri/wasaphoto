@@ -23,7 +23,7 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	toView := ps.ByName("username")
+	toView := ps.ByName("userID")
 	profile, err := rt.db.GetAccount(token, toView)
 	if errors.Is(err, database.ErrUserIsBlocked) {
 		http.Error(w, "Forbidden: user blocked you!", http.StatusForbidden)

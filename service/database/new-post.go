@@ -51,7 +51,11 @@ func (db *appdbimpl) NewPost(op string, imgB64 string, caption string) (int64, e
 	if err != nil {
 		return 0, err
 	}
-	imgPath := "/srv/wasaphoto/posts/" + strconv.FormatInt(postID, 10) + ".jpg"
+	err = os.MkdirAll(db.installRoot+"/posts", 0755)
+	if err != nil {
+		return 0, err
+	}
+	imgPath := db.installRoot + "/" + op + "/posts/" + strconv.FormatInt(postID, 10) + ".jpg"
 	imgFile, err := os.Create(imgPath)
 	if err != nil {
 		return 0, err

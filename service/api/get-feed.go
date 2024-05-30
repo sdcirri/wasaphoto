@@ -1,35 +1,41 @@
 package api
 
 import (
-    "github.com/sdgondola/wasaphoto/service/database"
-	"github.com/julienschmidt/httprouter"
-    "encoding/json"
+	"encoding/json"
+	"errors"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/sdgondola/wasaphoto/service/database"
 )
 
 func (rt *_router) getFeed(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-    idc, err := r.Cookie("WASASESSIONID")
-    if err == http.ErrNoCookie {
-        http.Error(w, "Unauthenticated", http.StatusUnauthorized)
-        return
-    } else if err != nil {
-    	http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
-    	return
-    }
-    id := idc.Value
-
-    feed, err := rt.db.GetFeed(id)
-    if err == database.ErrUserNotFound {
-        http.Error(w, "Bad request: hacking attempt?!", http.StatusBadRequest)
-    } else if err != nil {
-        http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
-    } else {
-        j, err := json.Marshal(feed)
-        if err != nil {
-        	http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
-        	return
-        }
-        w.Header().Set("content-type", "application/json")
-        w.Write(j)
-    }
+	token, err := rt.getAuthToken(r)
+	if errors.Is(err, ErrNoAuth) {
+		http.Error(w, "Unauthenticated", http.StatusUnauthorized)
+		return
+	} else if errors.Is(err, database.ErrUserNotFound) {
+		http.Error(w, "Bad authentication token", http.StatusBadRequest)
+		return
+	} else if err != nil {
+		rt.internalServerError(err, w)
+		return
+	}
+	feed, err := rt.db.GetFeed(token)
+	if errors.Is(err, database.ErrUserNotFound) {
+		http.Error(w, "Bad authentication token", http.StatusBadRequest)
+	} else if err != nil {
+		rt.internalServerError(err, w)
+	} else {
+		j, err := json.Marshal(feed)
+		if err != nil {
+			rt.internalServerError(err, w)
+			return
+		}
+		w.Header().Set("content-type", "application/json")
+		_, err = w.Write(j)
+		if err != nil {
+			rt.internalServerError(err, w)
+		}
+	}
 }

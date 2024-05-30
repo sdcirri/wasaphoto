@@ -9,7 +9,7 @@ import (
 	"github.com/sdgondola/wasaphoto/service/database"
 )
 
-func (rt *_router) unlikeComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) deleteComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	token, err := rt.getAuthToken(r)
 	if errors.Is(err, ErrNoAuth) {
 		http.Error(w, "Unauthenticated", http.StatusUnauthorized)
@@ -22,7 +22,7 @@ func (rt *_router) unlikeComment(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 	if token != ps.ByName("userID") {
-		http.Error(w, "Error: trying to like as somebody else", http.StatusForbidden)
+		http.Error(w, "Error: trying to delete somebody else's comment", http.StatusForbidden)
 		return
 	}
 	commentID, err := strconv.ParseInt(ps.ByName("commentID"), 10, 64)
@@ -31,25 +31,16 @@ func (rt *_router) unlikeComment(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	err = rt.db.UnlikeComment(token, commentID)
+	err = rt.db.DeleteComment(token, commentID)
 	if errors.Is(err, database.ErrUserNotFound) {
-		http.Error(w, "Bad authentication token", http.StatusBadRequest)
+		http.Error(w, "Bad request: no such user", http.StatusBadRequest)
+	} else if errors.Is(err, database.ErrUserIsNotAuthor) {
+		http.Error(w, "Error: trying to delete somebody else's comment", http.StatusForbidden)
 	} else if errors.Is(err, database.ErrCommentNotFound) {
 		http.Error(w, database.ErrCommentNotFound.Error(), http.StatusNotFound)
-	} else if errors.Is(err, database.ErrUserIsBlocked) {
-		http.Error(w, "Cannot like comment: user blocked you!", http.StatusForbidden)
-	} else if err != nil && !errors.Is(err, database.ErrAlreadyLiked) { // We can safely ignore that as it's likely some duplicate request
+	} else if err != nil {
 		rt.internalServerError(err, w)
 	} else {
-		c, err := rt.db.GetComment(commentID)
-		if err != nil {
-			rt.internalServerError(err, w)
-		}
-		w.WriteHeader(http.StatusCreated)
-		w.Header().Set("content-type", "text/plain")
-		_, err = w.Write([]byte(strconv.FormatInt(int64(c.Likes), 10)))
-		if err != nil {
-			rt.internalServerError(err, w)
-		}
+		w.WriteHeader(http.StatusNoContent)
 	}
 }

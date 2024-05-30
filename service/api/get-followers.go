@@ -26,7 +26,7 @@ func (rt *_router) getFollowers(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	followers, err := rt.db.GetFollowers(token)
-	if err == database.ErrUserNotFound {
+	if errors.Is(err, database.ErrUserNotFound) {
 		// Very unlikely but still possible
 		http.Error(w, "Bad authentication token", http.StatusBadRequest)
 	} else if err != nil {

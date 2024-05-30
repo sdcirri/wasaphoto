@@ -28,17 +28,19 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/sdgondola/wasaphoto/service/api"
-	"github.com/sdgondola/wasaphoto/service/database"
-	"github.com/sdgondola/wasaphoto/service/globaltime"
-	"github.com/ardanlabs/conf"
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/sirupsen/logrus"
+	"io"
 	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/ardanlabs/conf"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/sdgondola/wasaphoto/service/api"
+	"github.com/sdgondola/wasaphoto/service/database"
+	"github.com/sdgondola/wasaphoto/service/globaltime"
+	"github.com/sirupsen/logrus"
 )
 
 // main is the program entry point. The only purpose of this function is to call run() and set the exit code if there is
@@ -82,6 +84,33 @@ func run() error {
 
 	// Start Database
 	logger.Println("initializing database support")
+
+	// Init filesystem structure for DB
+	err = os.MkdirAll(cfg.DB.InstallRoot, 0755)
+	if err != nil {
+		return err
+	}
+
+	if cfg.Debug { // In production we're sure the assets are in the correct location
+		propic_file, err := os.Open("./demo/propic_default.jpg")
+		if err != nil {
+			logger.Warn("Error loading default profile picture asset (" + err.Error() + "): expect errors while requesting profile info!")
+		} else {
+			dst, err := os.Create(cfg.DB.InstallRoot + "/propic_default.jpg")
+			if err != nil {
+				_ = propic_file.Close()
+				logger.Warn("Error writing default profile picture asset (" + err.Error() + "): expect errors while requesting profile info!")
+			} else {
+				_, err = io.Copy(dst, propic_file)
+				if err != nil {
+					logger.Warn("Error writing default profile picture asset (" + err.Error() + "): expect errors while requesting profile info!")
+				}
+				_ = propic_file.Close()
+				_ = dst.Close()
+			}
+		}
+	}
+
 	dbconn, err := sql.Open("sqlite3", cfg.DB.Filename)
 	if err != nil {
 		logger.WithError(err).Error("error opening SQLite DB")

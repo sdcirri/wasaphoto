@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -15,19 +16,30 @@ type PostParams struct {
 }
 
 func (rt *_router) newPost(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	idc, err := r.Cookie("WASASESSIONID")
-	if err == http.ErrNoCookie {
+	token, err := rt.getAuthToken(r)
+	if errors.Is(err, ErrNoAuth) {
 		http.Error(w, "Unauthenticated", http.StatusUnauthorized)
 		return
+	} else if errors.Is(err, database.ErrUserNotFound) {
+		http.Error(w, "Bad authentication token", http.StatusBadRequest)
+		return
 	} else if err != nil {
-		http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
+		rt.internalServerError(err, w)
 		return
 	}
+	if token != ps.ByName("userID") {
+		http.Error(w, "Forbidden: cannot post as somebody else", http.StatusForbidden)
+		return
+	}
+
 	var postParams PostParams
-	id := idc.Value
 	err = json.NewDecoder(r.Body).Decode(&postParams)
 	if err != nil {
 		http.Error(w, "Bad request: malformed json: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+	if len(postParams.Image) > 3000000 {
+		http.Error(w, "bad request: image too big, images up to 2 MB are supported", http.StatusBadRequest)
 		return
 	}
 	if len(postParams.Caption) > 2048 {
@@ -35,18 +47,21 @@ func (rt *_router) newPost(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	postID, err := rt.db.NewPost(id, postParams.Image, postParams.Caption)
-	if err == database.ErrUserNotFound {
-		http.Error(w, "Bad request: hacking attempt?!", http.StatusBadRequest)
+	postID, err := rt.db.NewPost(token, postParams.Image, postParams.Caption)
+	if errors.Is(err, database.ErrUserNotFound) {
+		http.Error(w, "Bad authentication token", http.StatusBadRequest)
 	}
-	if err == database.ErrBadImage {
+	if errors.Is(err, database.ErrBadImage) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 	if err != nil {
-		http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
+		rt.internalServerError(err, w)
 		return
 	}
 
 	w.Header().Set("content-type", "text/plain")
-	_, _ = w.Write([]byte(strconv.FormatInt(postID, 10)))
+	_, err = w.Write([]byte(strconv.FormatInt(postID, 10)))
+	if err != nil {
+		rt.internalServerError(err, w)
+	}
 }

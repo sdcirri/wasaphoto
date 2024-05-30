@@ -309,6 +309,8 @@ paths:
           description: Bad auth token or trying to remove yourself
         '401':
           description: Unauthenticated
+        '403':
+          description: Trying to edit somebody else's followers
         '404':
           description: User not found or not following
 
@@ -317,17 +319,12 @@ paths:
       tags:
         - Post tools
       summary: New post
-      description: Creates a new post with the supplied image and, optionally, a description. On success returns the post info
+      description: Creates a new post with the supplied image and, optionally, a description. On success returns the post ID
       operationId: newPost
       parameters:
         - in: path
           name: userID
           description: Your username
-          required: true
-          $ref: '#/components/schemas/Username'
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
           required: true
           $ref: '#/components/schemas/Username'
       requestBody:
@@ -339,40 +336,15 @@ paths:
         '201':
           description: Successful operation
           content:
-            application/json:
+            text/plain:
               schema:
-                $ref: '#/components/schemas/Post'
+                $ref: '#/components/schemas/ID'
         '400':
-          description: Bad cookie, malformed JSON or caption too long
-        '401':
-          description: Unauthenticated
-
-  /posts/{postID}/delete:
-    delete:
-      tags:
-        - Post tools
-      summary: Delete post
-      description: Deletes one of your posts. Be careful! Once deleted, posts are lost forever!
-      operationId: deletePost
-      parameters:
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          $ref: '#/components/schemas/Username'
-        - in: path
-          name: postID
-          required: true
-          $ref: '#/components/schemas/ID'
-      responses:
-        '204':
-          description: Operation successful
+          description: Bad auth token, malformed JSON, image too big or caption too long
         '401':
           description: Unauthenticated
         '403':
-          description: Forbidden, you cannot delete somebody else's posts!
-        '404':
-          description: Post not found
+          description: Cannot post as somebody else
 
   /posts/{postID}:
     get:
@@ -395,11 +367,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/Post'
         '400':
-          description: Bad cookie
+          description: Bad auth token
         '401':
           description: Unauthenticated
         '403':
           description: User blocked you!
+        '404':
+          description: Post not found
+
+  /posts/{postID}/delete:
+    delete:
+      tags:
+        - Post tools
+      summary: Delete post
+      description: Deletes one of your posts. Be careful! Once deleted, posts are lost forever!
+      operationId: deletePost
+      parameters:
+        - in: path
+          name: postID
+          required: true
+          $ref: '#/components/schemas/ID'
+      responses:
+        '204':
+          description: Operation successful
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden, you cannot delete somebody else's posts!
         '404':
           description: Post not found
 
@@ -408,7 +402,7 @@ paths:
       tags:
         - Post tools
       summary: Get likes
-      description: Get likes on YOUR post
+      description: Get likes on YOUR post. Nobody but the author can see who liked a post
       operationId: getLikes
       parameters:
         - in: cookie
@@ -452,12 +446,6 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/Username'
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          schema:
-            $ref: '#/components/schemas/Username'
       responses:
         '200':
           description: Operation successful
@@ -465,8 +453,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Feed'
+        '400':
+          description: Bad auth token
         '401':
           description: Unauthenticated
+        '403':
+          description: Trying to view somebody else's feed
 
   /{userID}/posts/{postID}/like:
     put:
@@ -476,12 +468,6 @@ paths:
       description: Adds a like as the logged user. On success returns the new like count
       operationId: likePost
       parameters:
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          schema:
-            $ref: '#/components/schemas/Username'
         - in: path
           name: userID
           description: Your username
@@ -501,7 +487,7 @@ paths:
               schema:
                 type: integer
         '400':
-          description: Bad cookie
+          description: Bad auth token or bad post ID
         '401':
           description: Unauthenticated
         '403':
@@ -517,12 +503,6 @@ paths:
       description: Removes the like as the logged user (if any). On success returns the new like count
       operationId: unlikePost
       parameters:
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          schema:
-            type: string
         - in: path
           name: userID
           description: Your username
@@ -533,16 +513,16 @@ paths:
           name: postID
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ID'
       responses:
-        '204':
+        '200':
           description: Operation successful
           content:
             text/plain:
               schema:
                 type: integer
         '400':
-          description: Bad cookie or post wasn't liked
+          description: Bad auth token, bad post ID or post wasn't liked
         '401':
           description: Unauthenticated
         '404':
@@ -553,13 +533,13 @@ paths:
       tags:
         - Feed tools
       summary: Comment on a post
-      description: Comments on a post. On success returns the new comment
+      description: Comments on a post. On success returns the new comment ID
       operationId: commentPost
       requestBody:
         content:
           text/plain:
             schema:
-              type: string
+              $ref: '#/components/schemas/LargeText'
       parameters:
         - in: path
           name: userID
@@ -567,26 +547,20 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/Username'
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          schema:
-            type: string
         - in: path
           name: postID
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ID'
       responses:
         '201':
           description: Operation successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Comment'
+                $ref: '#/components/schemas/ID'
         '400':
-          description: Bad cookie, empty comment or comment too long
+          description: Bad cookie, bad post ID, empty comment or comment too long
         '401':
           description: Unauthenticated
         '403':
@@ -608,17 +582,11 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/Username'
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          schema:
-            type: string
         - in: path
           name: commentID
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ID'
       responses:
         '201':
           description: Operation successful
@@ -627,11 +595,11 @@ paths:
               schema:
                 type: integer
         '400':
-          description: Bad cookie
+          description: Bad authentication token or bad comment ID
         '401':
           description: Unauthenticated
         '403':
-          description: "Cannot like: commenter blocked you!"
+          description: "Cannot like: author blocked you!"
         '404':
           description: Comment not found
 
@@ -649,28 +617,52 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/Username'
-        - in: cookie
-          name: WASASESSIONID
-          description: Your session cookie
-          required: true
-          schema:
-            type: string
         - in: path
           name: commentID
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ID'
       responses:
-        '204':
+        '200':
           description: Operation successful
           content:
             text/plain:
               schema:
                 type: integer
         '400':
-          description: Bad cookie or comment wasn't liked
+          description: Bad authentication token, bad comment ID or comment wasn't liked
         '401':
           description: Unauthenticated
+        '404':
+          description: Comment not found
+
+  /{userID}/comments/{commentID}/delete:
+    delete:
+      tags:
+        - Feed tools
+      summary: Remove a comment
+      description: Removes the specified comment. Only the author can do that!
+      parameters:
+      - in: path
+        name: userID
+        description: Your username
+        required: true
+        schema:
+          $ref: '#/components/schemas/Username'
+      - in: path
+        name: commentID
+        required: true
+        schema:
+          $ref: '#/components/schemas/ID'
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Bad comment ID
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden, you cannot delete somebody else's comment!
         '404':
           description: Comment not found
 
@@ -693,14 +685,18 @@ components:
       maxLength: 127
       example: user123
 
+    B64Image:
+      type: string
+      format: binary
+      maxLength: 3000000    # images up to about 2 MB are supported
+
     Account:
       type: object
       properties:
         username:
           $ref: '#/components/schemas/Username'
         proPicB64:
-          type: string
-          format: binary
+          $ref: '#/components/schemas/B64Image'
         followers:
           type: integer
           format: int64
@@ -716,6 +712,12 @@ components:
           items:
             $ref: '#/components/schemas/ID'
   
+    LargeText:
+      type: string
+      minLength: 0
+      maxLength: 2048
+      example: Currently working on WASAPhoto!
+
     Post:
       type: object
       properties:
@@ -730,11 +732,9 @@ components:
           type: string
           example: 2024-05-24T15:00:00
         imageB64:
-          type: string
-          format: binary
+          $ref: '#/components/schemas/B64Image'
         caption:
-          type: string
-          example: Currently working on WASAPhoto!
+          $ref: '#/components/schemas/LargeText'
         likeCount:
           type: integer
           format: int64
@@ -750,11 +750,9 @@ components:
       type: object
       properties:
         image:
-          type: string
-          description: image encoded in base64
-          format: binary
+          $ref: '#/components/schemas/B64Image'
         caption:
-          type: string
+          $ref: '#/components/schemas/LargeText'
 
     LikeList:
       type: array
@@ -774,8 +772,7 @@ components:
           minimum: 0
           example: 15
         content:
-          type: string
-          example: Nice photo!
+          $ref: '#/components/schemas/LargeText'
 
     CommentList:
       type: array

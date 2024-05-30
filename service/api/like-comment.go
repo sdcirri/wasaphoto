@@ -1,44 +1,55 @@
 package api
 
 import (
-    "github.com/sdgondola/wasaphoto/service/database"
-	"github.com/julienschmidt/httprouter"
+	"errors"
 	"net/http"
-    "strconv"
+	"strconv"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/sdgondola/wasaphoto/service/database"
 )
 
 func (rt *_router) likeComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-    idc, err := r.Cookie("WASASESSIONID")
-    if err == http.ErrNoCookie {
-        http.Error(w, "Unauthenticated", http.StatusUnauthorized)
-        return
-    } else if err != nil {
-        http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
-        return
-    }
-    toBlock := ps.ByName("commentID")
-    if toBlock == "" {
-        http.Error(w, "Bad request: no username provided", http.StatusBadRequest)
-        return
-    }
-    id := idc.Value
-    commentID, err := strconv.ParseInt(ps.ByName("commentID"), 10, 64)
-    if err != nil {
-        http.Error(w, database.ErrPostNotFound.Error(), http.StatusNotFound)
-        return
-    }
+	token, err := rt.getAuthToken(r)
+	if errors.Is(err, ErrNoAuth) {
+		http.Error(w, "Unauthenticated", http.StatusUnauthorized)
+		return
+	} else if errors.Is(err, database.ErrUserNotFound) {
+		http.Error(w, "Bad authentication token", http.StatusBadRequest)
+		return
+	} else if err != nil {
+		rt.internalServerError(err, w)
+		return
+	}
+	if token != ps.ByName("userID") {
+		http.Error(w, "Error: trying to like as somebody else", http.StatusForbidden)
+		return
+	}
+	commentID, err := strconv.ParseInt(ps.ByName("commentID"), 10, 64)
+	if err != nil {
+		http.Error(w, "Bad comment ID: "+ps.ByName("commentID"), http.StatusBadRequest)
+		return
+	}
 
-    err = rt.db.LikeComment(id, commentID)
-    if err == database.ErrUserNotFound {
-        // This is kinda suspicious, likely a forged cookie
-        http.Error(w, "Bad request: hacking attempt?!", http.StatusBadRequest)
-    } else if err == database.ErrCommentNotFound {
-        http.Error(w, database.ErrCommentNotFound.Error(), http.StatusNotFound)
-    } else if err == database.ErrUserIsBlocked {
-        http.Error(w, "Cannot like post: user blocked you!", http.StatusForbidden)
-    } else if err != nil && err != database.ErrAlreadyLiked {    // We can safely ignore that as it's likely some duplicate request
-        http.Error(w, "Internal server error: " + err.Error(), http.StatusInternalServerError)
-    } else {
-        w.WriteHeader(http.StatusCreated)
-    }
+	err = rt.db.LikeComment(token, commentID)
+	if errors.Is(err, database.ErrUserNotFound) {
+		http.Error(w, "Bad authentication token", http.StatusBadRequest)
+	} else if errors.Is(err, database.ErrCommentNotFound) {
+		http.Error(w, database.ErrCommentNotFound.Error(), http.StatusNotFound)
+	} else if errors.Is(err, database.ErrUserIsBlocked) {
+		http.Error(w, "Cannot like comment: user blocked you!", http.StatusForbidden)
+	} else if err != nil && !errors.Is(err, database.ErrAlreadyLiked) { // We can safely ignore that as it's likely some duplicate request
+		rt.internalServerError(err, w)
+	} else {
+		c, err := rt.db.GetComment(commentID)
+		if err != nil {
+			rt.internalServerError(err, w)
+		}
+		w.WriteHeader(http.StatusCreated)
+		w.Header().Set("content-type", "text/plain")
+		_, err = w.Write([]byte(strconv.FormatInt(int64(c.Likes), 10)))
+		if err != nil {
+			rt.internalServerError(err, w)
+		}
+	}
 }

@@ -33,7 +33,6 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"os"
 )
 
 // Data model
@@ -107,12 +106,14 @@ type AppDatabase interface {
 	CommentPost(user string, postID int64, comment string) (int64, error)
 	LikeComment(user string, commentID int64) error
 	UnlikeComment(user string, commentID int64) error
+	DeleteComment(user string, commentID int64) error
 	GetFeed(user string) ([]int64, error)
 	Ping() error
 }
 
 type appdbimpl struct {
-	c *sql.DB
+	c           *sql.DB
+	installRoot string
 }
 
 // New returns a new instance of AppDatabase based on the SQLite connection `db`.
@@ -121,9 +122,6 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if db == nil {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
-
-	// Init filesystem structure for DB
-	os.MkdirAll("/srv/wasaphoto/posts", 0755)
 
 	// SQL statements for each table
 	tables := [7]string{
