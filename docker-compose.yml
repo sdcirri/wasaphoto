@@ -8,5 +8,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - './data/conf:/etc/wasaphoto'
-      - './data/db:/srv/wasaphoto'
+      - './demo/db:/srv/wasaphoto'
+    environment:
+      CFG_CONFIG_PATH: /etc/wasaphoto/config.yml
+

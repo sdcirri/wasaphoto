@@ -3,6 +3,7 @@
 
 log:
   level: debug
+debug: true
 #  methodname: false
 #  json: false
 #  destination: stderr

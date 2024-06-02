@@ -23,6 +23,6 @@ func (db *appdbimpl) RegisterUser(username string) error {
 		return err
 	}
 	// Directory to store user data such as profile picture and posted pictures
-	err = os.MkdirAll(db.installRoot+username, 0755)
+	err = os.MkdirAll(db.installRoot+"/"+username, 0755)
 	return err
 }

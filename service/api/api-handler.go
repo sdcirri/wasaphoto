@@ -28,6 +28,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.PUT("/comments/:commentID/like/:userID", rt.likeComment)
 	rt.router.DELETE("/comments/:commentID/unlike/:userID", rt.unlikeComment)
 	rt.router.DELETE("/comments/:commentID/delete/:userID", rt.deleteComment)
+	rt.router.GET("/searchUser", rt.SearchUser)
 
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)

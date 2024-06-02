@@ -109,6 +109,7 @@ type AppDatabase interface {
 	UnlikeComment(user string, commentID int64) error
 	DeleteComment(user string, commentID int64) error
 	GetFeed(user string) ([]int64, error)
+	SearchUser(query string) ([]string, error)
 	Ping() error
 }
 

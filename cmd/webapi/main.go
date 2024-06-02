@@ -92,7 +92,8 @@ func run() error {
 	}
 
 	if cfg.Debug { // In production we're sure the assets are in the correct location
-		propic_file, err := os.Open("./demo/propic_default.jpg")
+		logger.Println("running in debug mode (data will be wiped on next reboot)")
+		propic_file, err := os.Open("./demo/db/propic_default.jpg")
 		if err != nil {
 			logger.Warn("Error loading default profile picture asset (" + err.Error() + "): expect errors while requesting profile info!")
 		} else {

@@ -173,7 +173,8 @@ paths:
           name: userID
           description: Your username
           required: true
-          $ref: '#/components/schemas/Username'
+          schema:
+            $ref: '#/components/schemas/Username'
         - in: path
           name: username
           description: User to unfollow
@@ -238,12 +239,14 @@ paths:
           name: userID
           description: Your username
           required: true
-          $ref: '#/components/schemas/Username'
+          schema:
+            $ref: '#/components/schemas/Username'
         - in: path
           name: username
           description: User to unblock
           required: true
-          $ref: '#/components/schemas/Username'
+          schema:
+            $ref: '#/components/schemas/Username'
       responses:
         '204':
           description: Successful operation
@@ -266,7 +269,8 @@ paths:
           name: userID
           description: Your username
           required: true
-          $ref: '#/components/schemas/Username'
+          schema:
+            $ref: '#/components/schemas/Username'
       responses:
         '200':
           description: successful operation
@@ -295,7 +299,8 @@ paths:
           name: userID
           description: Your username
           required: true
-          $ref: '#/components/schemas/Username'
+          schema:
+            $ref: '#/components/schemas/Username'
         - in: path
           name: username
           description: Follower to remove
@@ -326,7 +331,8 @@ paths:
           name: userID
           description: Your username
           required: true
-          $ref: '#/components/schemas/Username'
+          schema:
+            $ref: '#/components/schemas/Username'
       requestBody:
         content:
           application/json:
@@ -386,7 +392,8 @@ paths:
         - in: path
           name: postID
           required: true
-          $ref: '#/components/schemas/ID'
+          schema:
+            $ref: '#/components/schemas/ID'
       responses:
         '204':
           description: Operation successful
@@ -422,7 +429,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LikeList'
+                $ref: '#/components/schemas/UserList'
         '400':
           description: Bad cookie
         '401':
@@ -568,6 +575,34 @@ paths:
         '404':
           description: Post not found
 
+  /comments/{commentID}:
+    get:
+      tags:
+        - Feed tools
+      summary: Get comment
+      description: Retrieves the comment associated with the supplied ID
+      operationId: getComment
+      parameters:
+        - in: path
+          name: commentID
+          description: Comment ID
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+      responses:
+        '200':
+          description: Operation successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '401':
+          description: Unauthenticated
+        '403':
+          description: "Forbidden: author blocked you!"
+        '404':
+          description: Comment not found
+
   /comments/{commentID}/like/{userID}:
     put:
       tags:
@@ -666,6 +701,29 @@ paths:
         '404':
           description: Comment not found
 
+  /searchUser:
+    get:
+      tags:
+        - Followers
+      summary: Search for users
+      description: Search registered users on the website
+      parameters:
+        - in: query
+          name: q
+          description: Your search query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Username'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+        '400':
+          description: Empty query
+
 components:
   securitySchemes:
     bearerAuth:
@@ -676,11 +734,20 @@ components:
     ID:
       type: integer
       format: int64
+      description: ID represents an integer used as an identifier (such as postID and commentID)
       minimum: 0
       example: 32156
 
+    Counter:
+      type: integer
+      format: uint64
+      description: A counter used to represent likes/comments/followers counts
+      minimum: 0
+      example: 80
+
     Username:
       type: string
+      description: A valid username, case-insensitive
       minLength: 3
       maxLength: 127
       example: user123
@@ -689,98 +756,94 @@ components:
       type: string
       format: binary
       maxLength: 3000000    # images up to about 2 MB are supported
+      description: An image encoded in base64
+
+    LargeText:
+      type: string
+      description: A large text, used in post captions and comments
+      minLength: 0
+      maxLength: 2048
+      example: Currently working on WASAPhoto!
 
     Account:
       type: object
+      description: A JSON representing a user account
       properties:
         username:
           $ref: '#/components/schemas/Username'
         proPicB64:
           $ref: '#/components/schemas/B64Image'
         followers:
-          type: integer
-          format: int64
-          minimum: 0
-          example: 150
+          $ref: '#/components/schemas/Counter'
         following:
-          type: integer
-          format: int64
-          minimum: 0
-          example: 150
+          $ref: '#/components/schemas/Counter'
         posts:
           type: array
+          description: Posts by this user as postIDs
           items:
             $ref: '#/components/schemas/ID'
-  
-    LargeText:
-      type: string
-      minLength: 0
-      maxLength: 2048
-      example: Currently working on WASAPhoto!
 
     Post:
       type: object
+      description: A JSON representing a post
       properties:
         postID:
-          type: integer
-          format: int64
-          minimum: 0
-          example: 32457
+          $ref: '#/components/schemas/ID'
         author:
           $ref: '#/components/schemas/Username'
         pubTime:
           type: string
+          description: Publication time for this post
           example: 2024-05-24T15:00:00
         imageB64:
           $ref: '#/components/schemas/B64Image'
         caption:
           $ref: '#/components/schemas/LargeText'
         likeCount:
-          type: integer
-          format: int64
-          minimum: 0
-          example: 24
-        commentCount:
-          type: integer
-          format: int64
-          minimum: 0
-          example: 10
+          $ref: '#/components/schemas/Counter'
+        comments:
+          $ref: '#/components/schemas/CommentList'
 
     PostParams:
       type: object
+      description: |-
+        A JSON containing all the required parameters
+        to ask the backend to create a new post
       properties:
         image:
           $ref: '#/components/schemas/B64Image'
         caption:
           $ref: '#/components/schemas/LargeText'
 
-    LikeList:
+    UserList:
       type: array
+      description: A list of users
       items:
         $ref: '#/components/schemas/Username'
 
     Comment:
       type: object
+      description: A JSON representing a comment
       properties:
         id:
           $ref: '#/components/schemas/ID'
         author:
           $ref: '#/components/schemas/Username'
         likes:
-          type: integer
-          format: int64
-          minimum: 0
-          example: 15
+          $ref: '#/components/schemas/Counter'
         content:
           $ref: '#/components/schemas/LargeText'
 
     CommentList:
       type: array
+      description: A list of comments (as commentIDs) belonging to a specific post
       items:
         $ref: '#/components/schemas/ID'
 
     Feed:
       type: array
+      description: |-
+        A list of posts (as postIDs) in reverse chronological order, representing a user's feed
       items:
         $ref: '#/components/schemas/ID'
 
