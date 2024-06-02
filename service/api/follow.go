@@ -20,6 +20,14 @@ func (rt *_router) follow(w http.ResponseWriter, r *http.Request, ps httprouter.
 		rt.internalServerError(err, w)
 		return
 	}
+	follower := ps.ByName("userID")
+	if follower == "" {
+		http.Error(w, "Bad request: no userID provided", http.StatusBadRequest)
+		return
+	} else if follower != token {
+		http.Error(w, "Bad request: bad userID", http.StatusBadRequest)
+		return
+	}
 	toFollow := ps.ByName("username")
 	if toFollow == "" {
 		http.Error(w, "Bad request: no username provided", http.StatusBadRequest)

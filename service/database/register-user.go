@@ -5,8 +5,27 @@ import (
 	"strings"
 )
 
+func getAllowedCharset() string {
+	chrset := ".-_"
+	for i := 'a'; i <= 'z'; i++ {
+		chrset += string(i)
+	}
+	for i := '0'; i <= 9; i++ {
+		chrset += string(i)
+	}
+	return chrset
+}
+
 func (db *appdbimpl) RegisterUser(username string) error {
+	allowed_charset := getAllowedCharset()
 	username = strings.ToLower(username)
+
+	for _, c := range username {
+		if !strings.Contains(allowed_charset, string(c)) {
+			return ErrBadCharset
+		}
+	}
+
 	exists, err := db.UserExists(username)
 	if err != nil {
 		return err

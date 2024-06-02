@@ -79,6 +79,7 @@ var (
 	ErrBadImage          = errors.New("error: bad image")
 	ErrUserIsNotAuthor   = errors.New("error: you cannot delete somebody else's post")
 	ErrAlreadyLiked      = errors.New("already liked")
+	ErrBadCharset        = errors.New("bad charset")
 )
 
 // AppDatabase is the high level interface for the DB
@@ -132,7 +133,7 @@ func New(db *sql.DB, installRoot string) (AppDatabase, error) {
 	// SQL statements for each table
 	tables := [7]string{
 		`create table if not exists Users (
-	username	varchar(64)		primary key,
+	username	varchar(127)	primary key,
 	propic		varchar(255)	not null default '/srv/wasaphoto/propic_default.jpg'
 );`,
 		`create table if not exists Follows (
@@ -186,10 +187,7 @@ func New(db *sql.DB, installRoot string) (AppDatabase, error) {
 
 	migration, err := db.Begin()
 	if err != nil {
-		return &appdbimpl{
-			c:           db,
-			installRoot: installRoot,
-		}, err
+		return nil, err
 	}
 
 	// Create the tables in order
@@ -197,10 +195,7 @@ func New(db *sql.DB, installRoot string) (AppDatabase, error) {
 		_, err = migration.Exec(s)
 		if err != nil {
 			migration.Rollback()
-			return &appdbimpl{
-				c:           db,
-				installRoot: installRoot,
-			}, err
+			return nil, err
 		}
 	}
 
@@ -208,10 +203,7 @@ func New(db *sql.DB, installRoot string) (AppDatabase, error) {
 	err = migration.Commit()
 	if err != nil {
 		migration.Rollback()
-		return &appdbimpl{
-			c:           db,
-			installRoot: installRoot,
-		}, err
+		return nil, err
 	}
 
 	return &appdbimpl{

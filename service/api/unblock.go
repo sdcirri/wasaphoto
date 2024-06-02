@@ -20,6 +20,14 @@ func (rt *_router) unblock(w http.ResponseWriter, r *http.Request, ps httprouter
 		rt.internalServerError(err, w)
 		return
 	}
+	blocker := ps.ByName("userID")
+	if blocker == "" {
+		http.Error(w, "Bad request: no userID provided", http.StatusBadRequest)
+		return
+	} else if blocker != token {
+		http.Error(w, "Bad request: bad userID", http.StatusBadRequest)
+		return
+	}
 	toUnblock := ps.ByName("username")
 	if toUnblock == "" {
 		http.Error(w, "Bad request: no username provided", http.StatusBadRequest)

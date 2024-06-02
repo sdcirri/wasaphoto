@@ -2,7 +2,7 @@ package database
 
 func (db *appdbimpl) SearchUser(query string) ([]string, error) {
 	res := make([]string, 0)
-	q, err := db.c.Query("select username from Users where username like '?%'", query)
+	q, err := db.c.Query("select username from Users where username like ? || '%'", query)
 	if err != nil {
 		return res, err
 	}

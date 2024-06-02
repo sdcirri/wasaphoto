@@ -20,7 +20,10 @@ func (rt *_router) login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 			return
 		}
 		err = rt.db.RegisterUser(username)
-		if err != nil {
+		if errors.Is(err, database.ErrBadCharset) {
+			http.Error(w, "Bad username charset", http.StatusBadRequest)
+			return
+		} else if err != nil {
 			rt.internalServerError(err, w)
 			return
 		}

@@ -57,7 +57,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Username'
         '400':
-          description: Invalid username, usernames should be between 3 and 127 characters long
+          description: |-
+            Invalid username, usernames should be between 3 and 127 characters long
+            and should not contain special characters except '.', '-' and '_'
 
   /setPP/{userID}:
     put:
@@ -747,6 +749,7 @@ components:
 
     Username:
       type: string
+      pattern: "^[A-z0-9_.-]{3,127}$"
       description: A valid username, case-insensitive
       minLength: 3
       maxLength: 127
@@ -793,6 +796,7 @@ components:
           $ref: '#/components/schemas/Username'
         pubTime:
           type: string
+          format: date-time
           description: Publication time for this post
           example: 2024-05-24T15:00:00
         imageB64:

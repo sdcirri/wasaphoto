@@ -10,7 +10,7 @@ import (
 func (rt *_router) SearchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	q := r.URL.Query().Get("q")
 	if q == "" {
-		http.Error(w, "Bad request: no username provided", http.StatusBadRequest)
+		http.Error(w, "Bad request: no search query provided", http.StatusBadRequest)
 		return
 	}
 	res, err := rt.db.SearchUser(q)
