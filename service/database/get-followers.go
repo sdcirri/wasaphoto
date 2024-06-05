@@ -1,10 +1,7 @@
 package database
 
-import "strings"
-
-func (db *appdbimpl) GetFollowers(id string) ([]string, error) {
-	id = strings.ToLower(id)
-	followers := make([]string, 0)
+func (db *appdbimpl) GetFollowers(id int64) ([]int64, error) {
+	followers := make([]int64, 0)
 	exists, err := db.UserExists(id)
 	if err != nil {
 		return followers, err
@@ -17,7 +14,7 @@ func (db *appdbimpl) GetFollowers(id string) ([]string, error) {
 		return followers, err
 	}
 	for q.Next() {
-		var f string
+		var f int64
 		err = q.Scan(&f)
 		if err != nil {
 			return followers, err

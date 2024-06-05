@@ -2,46 +2,33 @@ package database
 
 import (
 	"os"
+	"strconv"
 	"strings"
 )
 
-func getAllowedCharset() string {
-	chrset := ".-_"
-	for i := 'a'; i <= 'z'; i++ {
-		chrset += string(i)
-	}
-	for i := '0'; i <= 9; i++ {
-		chrset += string(i)
-	}
-	return chrset
-}
-
-func (db *appdbimpl) RegisterUser(username string) error {
-	allowed_charset := getAllowedCharset()
+func (db *appdbimpl) RegisterUser(username string) (int64, error) {
 	username = strings.ToLower(username)
-
-	for _, c := range username {
-		if !strings.Contains(allowed_charset, string(c)) {
-			return ErrBadCharset
-		}
-	}
-
-	exists, err := db.UserExists(username)
+	exists, err := db.UsernameTaken(username)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if exists {
-		return ErrUserAlreadyExists
+		return 0, ErrUserAlreadyExists
 	}
-	ins, err := db.c.Prepare("insert into Users values (?, ?)")
+
+	ins, err := db.c.Prepare("insert into Users(username, propic) values (?, ?)")
 	if err != nil {
-		return err
+		return 0, err
 	}
-	_, err = ins.Exec(username, db.installRoot+"/propic_default.jpg")
+	res, err := ins.Exec(username, db.installRoot+"/propic_default.jpg")
 	if err != nil {
-		return err
+		return 0, err
+	}
+	userID, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
 	}
 	// Directory to store user data such as profile picture and posted pictures
-	err = os.MkdirAll(db.installRoot+"/"+username, 0755)
-	return err
+	err = os.MkdirAll(db.installRoot+"/"+strconv.FormatInt(userID, 10), 0755)
+	return userID, err
 }

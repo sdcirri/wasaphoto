@@ -1,6 +1,5 @@
 package database
 
-func (db *appdbimpl) RmFollower(user string, follower string) error {
+func (db *appdbimpl) RmFollower(user int64, follower int64) error {
 	return db.Unfollow(follower, user)
 }
-

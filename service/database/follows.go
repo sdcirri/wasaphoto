@@ -1,13 +1,8 @@
 package database
 
-import (
-	"database/sql"
-	"strings"
-)
+import "database/sql"
 
-func (db *appdbimpl) Follows(follower string, following string) (bool, error) {
-	follower = strings.ToLower(follower)
-	following = strings.ToLower(following)
+func (db *appdbimpl) Follows(follower int64, following int64) (bool, error) {
 	exist, err := db.UsersExist(follower, following)
 	if err != nil {
 		return false, err

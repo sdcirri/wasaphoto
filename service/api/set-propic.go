@@ -21,8 +21,8 @@ func (rt *_router) setProPic(w http.ResponseWriter, r *http.Request, ps httprout
 		rt.internalServerError(err, w)
 		return
 	}
-	username := ps.ByName("userID")
-	if username != token {
+	userID := ps.ByName("userID")
+	if userID != token {
 		http.Error(w, "Error: you cannot set somebody else's profile picture", http.StatusForbidden)
 		return
 	}
@@ -31,7 +31,7 @@ func (rt *_router) setProPic(w http.ResponseWriter, r *http.Request, ps httprout
 		rt.internalServerError(err, w)
 		return
 	}
-	err = rt.db.SetProPic(username, string(body[:]))
+	err = rt.db.SetProPic(userID, string(body[:]))
 	if errors.Is(err, database.ErrUserNotFound) {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
@@ -44,7 +44,7 @@ func (rt *_router) setProPic(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	w.Header().Set("content-type", "text/plain")
-	_, err = w.Write([]byte(username))
+	_, err = w.Write([]byte(userID))
 	if err != nil {
 		rt.internalServerError(err, w)
 	}

@@ -2,11 +2,10 @@ package database
 
 import (
 	"database/sql"
-	"strings"
+	"errors"
 )
 
-func (db *appdbimpl) GetFeed(user string) ([]int64, error) {
-	user = strings.ToLower(user)
+func (db *appdbimpl) GetFeed(user int64) ([]int64, error) {
 	feed := make([]int64, 0)
 	exists, err := db.UserExists(user)
 	if err != nil {
@@ -16,7 +15,7 @@ func (db *appdbimpl) GetFeed(user string) ([]int64, error) {
 		return feed, ErrUserNotFound
 	}
 	q, err := db.c.Query("select postID from Posts where author in (select following from Follows where follower = ?) order by pub_time desc", user)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return feed, err
 	}
 	for q.Next() {

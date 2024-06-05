@@ -28,9 +28,9 @@ func (rt *_router) unblock(w http.ResponseWriter, r *http.Request, ps httprouter
 		http.Error(w, "Bad request: bad userID", http.StatusBadRequest)
 		return
 	}
-	toUnblock := ps.ByName("username")
+	toUnblock := ps.ByName("userID")
 	if toUnblock == "" {
-		http.Error(w, "Bad request: no username provided", http.StatusBadRequest)
+		http.Error(w, "Bad request: no userID provided", http.StatusBadRequest)
 		return
 	}
 	if toUnblock == token {

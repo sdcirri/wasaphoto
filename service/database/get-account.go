@@ -4,19 +4,17 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"os"
-	"strings"
 )
 
-func (db *appdbimpl) GetAccount(id string, username string) (Account, error) {
+func (db *appdbimpl) GetAccount(id int64, userID int64) (Account, error) {
 	var a Account
 	var imgPath string
-	username = strings.ToLower(username)
-	exists, err := db.UserExists(username)
+	exists, err := db.UserExists(userID)
 	if err != nil {
 		return a, err
 	}
 	if exists {
-		blocked, err := db.IsBlockedBy(id, username)
+		blocked, err := db.IsBlockedBy(id, userID)
 		if err != nil && err != ErrUserNotFound {
 			return a, err
 		}
@@ -27,18 +25,18 @@ func (db *appdbimpl) GetAccount(id string, username string) (Account, error) {
 		return a, ErrUserNotFound
 	}
 
-	err = db.c.QueryRow("select username, propic from Users where username = ?", username).Scan(&a.Username, &imgPath)
+	err = db.c.QueryRow("select userID, username, propic from Users where userID = ?", userID).Scan(&a.UserID, &a.Username, &imgPath)
 	if err != nil {
 		return a, err
 	}
-	err = db.c.QueryRow("select count(*) from Follows where following = ?", username).Scan(&a.Followers)
+	err = db.c.QueryRow("select count(*) from Follows where following = ?", userID).Scan(&a.Followers)
 	if err == sql.ErrNoRows {
 		a.Followers = 0
 	} else if err != nil {
 		return a, err
 	}
 
-	err = db.c.QueryRow("select count(*) from Follows where follower = ?", username).Scan(&a.Following)
+	err = db.c.QueryRow("select count(*) from Follows where follower = ?", userID).Scan(&a.Following)
 	if err == sql.ErrNoRows {
 		a.Following = 0
 	} else if err != nil {
@@ -46,7 +44,7 @@ func (db *appdbimpl) GetAccount(id string, username string) (Account, error) {
 	}
 
 	a.Posts = make([]int64, 0)
-	q, err := db.c.Query("select postID from Posts where author = ?", username)
+	q, err := db.c.Query("select postID from Posts where author = ?", userID)
 	if err != nil && err != sql.ErrNoRows {
 		return a, err
 	}

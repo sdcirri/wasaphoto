@@ -4,15 +4,13 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"io/ioutil"
-	"strings"
 	"time"
 )
 
-func (db *appdbimpl) GetPost(id string, postid int64) (Post, error) {
+func (db *appdbimpl) GetPost(id int64, postid int64) (Post, error) {
 	var p Post
 	var imgPath string
 	var pubts time.Time
-	id = strings.ToLower(id)
 	err := db.c.QueryRow("select * from Posts where postID = ?", postid).Scan(&p.PostID, &imgPath, &pubts, &p.Author, &p.Caption)
 	if err == sql.ErrNoRows {
 		return p, ErrPostNotFound

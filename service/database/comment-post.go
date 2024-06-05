@@ -1,13 +1,10 @@
 package database
 
 import (
-	"strings"
-
 	"github.com/sdgondola/wasaphoto/service/globaltime"
 )
 
-func (db *appdbimpl) CommentPost(user string, postID int64, comment string) (int64, error) {
-	user = strings.ToLower(user)
+func (db *appdbimpl) CommentPost(user int64, postID int64, comment string) (int64, error) {
 	exists, err := db.UserExists(user)
 	if err != nil {
 		return 0, err
@@ -22,7 +19,7 @@ func (db *appdbimpl) CommentPost(user string, postID int64, comment string) (int
 	if !exists {
 		return 0, ErrPostNotFound
 	}
-	var op string
+	var op int64
 	err = db.c.QueryRow("select author from Posts where postID = ?", postID).Scan(&op)
 	if err != nil {
 		return 0, err
@@ -34,7 +31,7 @@ func (db *appdbimpl) CommentPost(user string, postID int64, comment string) (int
 	if blocked {
 		return 0, ErrUserIsBlocked
 	}
-	ins, err := db.c.Prepare("insert into Comments values (?, ?, ?, ?) returning commentID")
+	ins, err := db.c.Prepare("insert into Comments values (?, ?, ?, ?)")
 	if err != nil {
 		return 0, err
 	}

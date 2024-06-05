@@ -3,11 +3,9 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"strings"
 )
 
-func (db *appdbimpl) DeleteComment(user string, commentID int64) error {
-	user = strings.ToLower(user)
+func (db *appdbimpl) DeleteComment(user int64, commentID int64) error {
 	exists, err := db.UserExists(user)
 	if err != nil {
 		return err
@@ -16,7 +14,7 @@ func (db *appdbimpl) DeleteComment(user string, commentID int64) error {
 		return ErrUserNotFound
 	}
 
-	var oc string
+	var oc int64
 	err = db.c.QueryRow("select author from Comments where commentID = ?", commentID).Scan(&oc)
 	if errors.Is(err, sql.ErrNoRows) {
 		return ErrCommentNotFound

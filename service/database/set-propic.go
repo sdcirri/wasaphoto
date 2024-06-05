@@ -6,12 +6,11 @@ import (
 	"image"
 	"image/jpeg"
 	"os"
-	"strings"
+	"strconv"
 )
 
-func (db *appdbimpl) SetProPic(username string, imgB64 string) error {
-	username = strings.ToLower(username)
-	exists, err := db.UserExists(username)
+func (db *appdbimpl) SetProPic(userID int64, imgB64 string) error {
+	exists, err := db.UserExists(userID)
 	if err != nil {
 		return err
 	}
@@ -26,7 +25,7 @@ func (db *appdbimpl) SetProPic(username string, imgB64 string) error {
 	if err != nil {
 		return ErrBadImage
 	}
-	dstPath := "/srv/wasaphoto/" + username + "/propic.jpg"
+	dstPath := "/srv/wasaphoto/" + strconv.FormatInt(userID, 10) + "/propic.jpg"
 	dst, err := os.Create(dstPath)
 	if err != nil {
 		return err
@@ -38,10 +37,10 @@ func (db *appdbimpl) SetProPic(username string, imgB64 string) error {
 	if err != nil {
 		return err
 	}
-	tran, err := db.c.Prepare("update Users set propic = ? where username = ?")
+	tran, err := db.c.Prepare("update Users set propic = ? where userID = ?")
 	if err != nil {
 		return err
 	}
-	_, err = tran.Exec(dstPath, username)
+	_, err = tran.Exec(dstPath, userID)
 	return err
 }

@@ -7,13 +7,11 @@ import (
 	"image/jpeg"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/sdgondola/wasaphoto/service/globaltime"
 )
 
-func (db *appdbimpl) NewPost(op string, imgB64 string, caption string) (int64, error) {
-	op = strings.ToLower(op)
+func (db *appdbimpl) NewPost(op int64, imgB64 string, caption string) (int64, error) {
 	exists, err := db.UserExists(op)
 	if err != nil {
 		return 0, err
@@ -55,7 +53,7 @@ func (db *appdbimpl) NewPost(op string, imgB64 string, caption string) (int64, e
 	if err != nil {
 		return 0, err
 	}
-	imgPath := db.installRoot + "/" + op + "/posts/" + strconv.FormatInt(postID, 10) + ".jpg"
+	imgPath := db.installRoot + "/" + strconv.FormatInt(op, 10) + "/posts/" + strconv.FormatInt(postID, 10) + ".jpg"
 	imgFile, err := os.Create(imgPath)
 	if err != nil {
 		return 0, err

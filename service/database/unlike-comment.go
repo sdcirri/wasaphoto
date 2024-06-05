@@ -1,12 +1,8 @@
 package database
 
-import (
-	"database/sql"
-	"strings"
-)
+import "database/sql"
 
-func (db *appdbimpl) UnlikeComment(user string, commentID int64) error {
-	user = strings.ToLower(user)
+func (db *appdbimpl) UnlikeComment(user int64, commentID int64) error {
 	exists, err := db.UserExists(user)
 	if err != nil {
 		return err

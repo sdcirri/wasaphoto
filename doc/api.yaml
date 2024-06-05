@@ -13,53 +13,65 @@ info:
 servers:
   - url: "http://localhost:3000"
 tags:
+  - name: Login
   - name: Account management
   - name: Followers
   - name: Post tools
   - name: Feed tools
 
 paths:
-  /login:
-    get:
+  /session:
+    post:
       tags:
-        - Account management
-      summary: Login
-      description: Logs in the user, if it doesn't exist, registers the user
-      operationId: login
+        - Login
+      summary: Logs in the user
+      description: |-
+        If the user does not exist, it will be created,
+        and an identifier is returned.
+        If the user exists, the user identifier is returned.
+      operationId: doLogin
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/Username'
+        required: true
+      responses:
+        '201':
+          description: User log-in action successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  identifier:
+                    $ref: '#/components/schemas/UserID'
+
+  /setUsername:
+    put:
+      tags:
+        - Login
+      summary: Sets the username
+      description: Changes the logged in user's username. Returns the same username on success
+      operationId: setMyUsername
       parameters:
         - in: query
           name: username
-          description: Login username
+          description: Username to set
           schema:
             $ref: '#/components/schemas/Username'
           required: true
       responses:
-        '200':
-          description: Successful operation
-          headers:
-            Set-Cookie:
-              schema:
-                type: string
-                example: WASASESSIONID=user123; Path=/; HttpOnly
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/Username'
         '201':
-          description: User registered
-          headers:
-            Set-Cookie:
-              schema:
-                type: string
-                example: WASASESSIONID=user123; Path=/; HttpOnly
+          description: Operation successful
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/Username'
-        '400':
-          description: |-
-            Invalid username, usernames should be between 3 and 127 characters long
-            and should not contain special characters except '.', '-' and '_'
 
   /setPP/{userID}:
     put:
@@ -75,7 +87,7 @@ paths:
           name: userID
           description: Your user ID (login name)
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
           required: true
       requestBody:
         content:
@@ -89,7 +101,7 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/Username'
+                $ref: '#/components/schemas/UserID'
         '400':
           description: Bad image
         '401':
@@ -112,7 +124,7 @@ paths:
           name: userID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
       responses:
         '200':
           description: Operation successful
@@ -127,33 +139,33 @@ paths:
         '404':
           description: User not found
 
-  /users/{userID}/follow/{username}:
+  /users/{userID}/follow/{UserID}:
     put:
       tags:
         - Followers
       summary: Follow user
       description: Follows a user. On success returns the followed user's ID
-      operationId: follow
+      operationId: followUser
       parameters:
         - in: path
           name: userID
-          description: Your username
+          description: Your UserID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
         - in: path
-          name: username
+          name: UserID
           description: User to follow
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
       responses:
         '201':
           description: Successful operation
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/Username'
+                $ref: '#/components/schemas/UserID'
         '400':
           description: bad auth token, already following or trying to follow yourself
         '401':
@@ -163,22 +175,22 @@ paths:
         '404':
           description: User not found
 
-  /users/{userID}/unfollow/{username}:
+  /users/{userID}/unfollow/{UserID}:
     delete:
       tags:
         - Followers
       summary: Unfollow user
       description: Unfollows a user
-      operationId: unfollow
+      operationId: unfollowUser
       parameters:
         - in: path
           name: userID
-          description: Your username
+          description: Your UserID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
         - in: path
-          name: username
+          name: UserID
           description: User to unfollow
           required: true
           schema:
@@ -193,7 +205,7 @@ paths:
         '404':
           description: User not found or not following
 
-  /users/{userID}/block/{username}:
+  /users/{userID}/block/{UserID}:
     put:
       tags:
         - Followers
@@ -201,27 +213,27 @@ paths:
       description: |-
         Blocks annoying user. On success returns the blocked user's ID.
         Also removes the user from your followers
-      operationId: block
+      operationId: banUser
       parameters:
         - in: path
           name: userID
-          description: Your username
+          description: Your UserID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
         - in: path
-          name: username
+          name: UserID
           description: User to block
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
       responses:
         '201':
           description: Successful operation
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/Username'
+                $ref: '#/components/schemas/UserID'
         '400':
           description: Bad auth token, already blocked or trying to block yourself
         '401':
@@ -229,26 +241,26 @@ paths:
         '404':
           description: User not found
 
-  /users/{userID}/unblock/{username}:
+  /users/{userID}/unblock/{UserID}:
     delete:
       tags:
         - Followers
       summary: Ublock user
       description: unblocks a previously blocked user
-      operationId: unblock
+      operationId: unbanUser
       parameters:
         - in: path
           name: userID
-          description: Your username
+          description: Your UserID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
         - in: path
-          name: username
+          name: UserID
           description: User to unblock
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
       responses:
         '204':
           description: Successful operation
@@ -269,10 +281,10 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your username
+          description: Your UserID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
       responses:
         '200':
           description: successful operation
@@ -289,7 +301,7 @@ paths:
         '403':
           description: "Forbidden: cannot view somebody else's followers"
 
-  /users/{userID}/followers/{username}/remove:
+  /users/{userID}/followers/{UserID}/remove:
     delete:
       tags:
         - Followers
@@ -299,12 +311,12 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your username
+          description: Your UserID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
         - in: path
-          name: username
+          name: UserID
           description: Follower to remove
           required: true
           schema:
@@ -327,14 +339,14 @@ paths:
         - Post tools
       summary: New post
       description: Creates a new post with the supplied image and, optionally, a description. On success returns the post ID
-      operationId: newPost
+      operationId: uploadPhoto
       parameters:
         - in: path
           name: userID
-          description: Your username
+          description: Your UserID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
       requestBody:
         content:
           application/json:
@@ -389,7 +401,7 @@ paths:
         - Post tools
       summary: Delete post
       description: Deletes one of your posts. Be careful! Once deleted, posts are lost forever!
-      operationId: deletePost
+      operationId: deletePhoto
       parameters:
         - in: path
           name: postID
@@ -419,7 +431,7 @@ paths:
           description: Your session cookie
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
         - in: path
           name: postID
           required: true
@@ -447,14 +459,14 @@ paths:
         - Feed tools
       summary: Retrieve feed
       description: Retrieves your feed made of the posts of the accounts you follow in reverse chronological order
-      operationId: getFeed
+      operationId: getMyStream
       parameters:
         - in: path
           name: userID
-          description: Your username
+          description: Your UserID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
       responses:
         '200':
           description: Operation successful
@@ -475,14 +487,14 @@ paths:
         - Feed tools
       summary: Like a post
       description: Adds a like as the logged user. On success returns the new like count
-      operationId: likePost
+      operationId: likePhoto
       parameters:
         - in: path
           name: userID
-          description: Your username
+          description: Your UserID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
         - in: path
           name: postID
           required: true
@@ -510,14 +522,14 @@ paths:
         - Feed tools
       summary: Unlikes a post
       description: Removes the like as the logged user (if any). On success returns the new like count
-      operationId: unlikePost
+      operationId: unlikePhoto
       parameters:
         - in: path
           name: userID
-          description: Your username
+          description: Your UserID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
         - in: path
           name: postID
           required: true
@@ -543,7 +555,7 @@ paths:
         - Feed tools
       summary: Comment on a post
       description: Comments on a post. On success returns the new comment ID
-      operationId: commentPost
+      operationId: commentPhoto
       requestBody:
         content:
           text/plain:
@@ -552,10 +564,10 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your username
+          description: Your UserID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
         - in: path
           name: postID
           required: true
@@ -615,10 +627,10 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your username
+          description: Your UserID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
         - in: path
           name: commentID
           required: true
@@ -650,10 +662,10 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your username
+          description: Your UserID
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
         - in: path
           name: commentID
           required: true
@@ -679,13 +691,14 @@ paths:
         - Feed tools
       summary: Remove a comment
       description: Removes the specified comment. Only the author can do that!
+      operationId: uncommentPhoto
       parameters:
       - in: path
         name: userID
-        description: Your username
+        description: Your UserID
         required: true
         schema:
-          $ref: '#/components/schemas/Username'
+          $ref: '#/components/schemas/UserID'
       - in: path
         name: commentID
         required: true
@@ -715,7 +728,7 @@ paths:
           description: Your search query
           required: true
           schema:
-            $ref: '#/components/schemas/Username'
+            $ref: '#/components/schemas/UserID'
       responses:
         '200':
           description: Successful operation
@@ -747,13 +760,20 @@ components:
       minimum: 0
       example: 80
 
-    Username:
+    UserID:
       type: string
       pattern: "^[A-z0-9_.-]{3,127}$"
-      description: A valid username, case-insensitive
+      description: A valid UserID, case-insensitive
       minLength: 3
       maxLength: 127
       example: user123
+
+    Username:
+      type: string
+      example: Maria
+      pattern: 'ˆ.*?$'
+      minLength: 3
+      maxLength: 40
 
     B64Image:
       type: string
@@ -764,6 +784,7 @@ components:
     LargeText:
       type: string
       description: A large text, used in post captions and comments
+      pattern: 'ˆ.*?$'
       minLength: 0
       maxLength: 2048
       example: Currently working on WASAPhoto!
@@ -772,8 +793,8 @@ components:
       type: object
       description: A JSON representing a user account
       properties:
-        username:
-          $ref: '#/components/schemas/Username'
+        UserID:
+          $ref: '#/components/schemas/UserID'
         proPicB64:
           $ref: '#/components/schemas/B64Image'
         followers:
@@ -793,7 +814,7 @@ components:
         postID:
           $ref: '#/components/schemas/ID'
         author:
-          $ref: '#/components/schemas/Username'
+          $ref: '#/components/schemas/UserID'
         pubTime:
           type: string
           format: date-time
@@ -823,7 +844,7 @@ components:
       type: array
       description: A list of users
       items:
-        $ref: '#/components/schemas/Username'
+        $ref: '#/components/schemas/UserID'
 
     Comment:
       type: object
@@ -832,7 +853,7 @@ components:
         id:
           $ref: '#/components/schemas/ID'
         author:
-          $ref: '#/components/schemas/Username'
+          $ref: '#/components/schemas/UserID'
         likes:
           $ref: '#/components/schemas/Counter'
         content:

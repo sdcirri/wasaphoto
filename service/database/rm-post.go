@@ -3,11 +3,9 @@ package database
 import (
 	"os"
 	"strconv"
-	"strings"
 )
 
-func (db *appdbimpl) RmPost(op string, post int64) error {
-	op = strings.ToLower(op)
+func (db *appdbimpl) RmPost(op int64, post int64) error {
 	exists, err := db.PostExists(post)
 	if err != nil {
 		return err

@@ -24,9 +24,9 @@ func (rt *_router) rmFollower(w http.ResponseWriter, r *http.Request, ps httprou
 		http.Error(w, "Forbidden: cannot delete somebosy else's followers", http.StatusForbidden)
 		return
 	}
-	toRm := ps.ByName("username")
+	toRm := ps.ByName("userID")
 	if toRm == "" {
-		http.Error(w, "Bad request: no username provided", http.StatusBadRequest)
+		http.Error(w, "Bad request: no userID provided", http.StatusBadRequest)
 		return
 	}
 	if toRm == token {

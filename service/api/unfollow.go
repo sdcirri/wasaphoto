@@ -28,9 +28,9 @@ func (rt *_router) unfollow(w http.ResponseWriter, r *http.Request, ps httproute
 		http.Error(w, "Bad request: bad userID", http.StatusBadRequest)
 		return
 	}
-	toUnfollow := ps.ByName("username")
+	toUnfollow := ps.ByName("userID")
 	if toUnfollow == "" {
-		http.Error(w, "Bad request: no username provided", http.StatusBadRequest)
+		http.Error(w, "Bad request: no userID provided", http.StatusBadRequest)
 		return
 	}
 	if toUnfollow == token {
