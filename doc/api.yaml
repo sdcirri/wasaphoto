@@ -49,7 +49,7 @@ paths:
                 type: object
                 properties:
                   identifier:
-                    $ref: '#/components/schemas/UserID'
+                    $ref: '#/components/schemas/ID'
 
   /setUsername:
     put:
@@ -72,6 +72,8 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/Username'
+        '403':
+          description: Username already taken
 
   /setPP/{userID}:
     put:
@@ -87,7 +89,7 @@ paths:
           name: userID
           description: Your user ID (login name)
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
           required: true
       requestBody:
         content:
@@ -101,7 +103,7 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/UserID'
+                $ref: '#/components/schemas/ID'
         '400':
           description: Bad image
         '401':
@@ -124,7 +126,7 @@ paths:
           name: userID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
       responses:
         '200':
           description: Operation successful
@@ -139,7 +141,7 @@ paths:
         '404':
           description: User not found
 
-  /users/{userID}/follow/{UserID}:
+  /users/{userID}/follow/{ID}:
     put:
       tags:
         - Followers
@@ -149,23 +151,23 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your UserID
+          description: Your ID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
         - in: path
-          name: UserID
+          name: ID
           description: User to follow
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
       responses:
         '201':
           description: Successful operation
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/UserID'
+                $ref: '#/components/schemas/ID'
         '400':
           description: bad auth token, already following or trying to follow yourself
         '401':
@@ -175,7 +177,7 @@ paths:
         '404':
           description: User not found
 
-  /users/{userID}/unfollow/{UserID}:
+  /users/{userID}/unfollow/{ID}:
     delete:
       tags:
         - Followers
@@ -185,12 +187,12 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your UserID
+          description: Your ID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
         - in: path
-          name: UserID
+          name: ID
           description: User to unfollow
           required: true
           schema:
@@ -205,7 +207,7 @@ paths:
         '404':
           description: User not found or not following
 
-  /users/{userID}/block/{UserID}:
+  /users/{userID}/block/{ID}:
     put:
       tags:
         - Followers
@@ -217,23 +219,23 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your UserID
+          description: Your ID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
         - in: path
-          name: UserID
+          name: ID
           description: User to block
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
       responses:
         '201':
           description: Successful operation
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/UserID'
+                $ref: '#/components/schemas/ID'
         '400':
           description: Bad auth token, already blocked or trying to block yourself
         '401':
@@ -241,7 +243,7 @@ paths:
         '404':
           description: User not found
 
-  /users/{userID}/unblock/{UserID}:
+  /users/{userID}/unblock/{ID}:
     delete:
       tags:
         - Followers
@@ -251,16 +253,16 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your UserID
+          description: Your ID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
         - in: path
-          name: UserID
+          name: ID
           description: User to unblock
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
       responses:
         '204':
           description: Successful operation
@@ -281,10 +283,10 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your UserID
+          description: Your ID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
       responses:
         '200':
           description: successful operation
@@ -301,7 +303,7 @@ paths:
         '403':
           description: "Forbidden: cannot view somebody else's followers"
 
-  /users/{userID}/followers/{UserID}/remove:
+  /users/{userID}/followers/{ID}/remove:
     delete:
       tags:
         - Followers
@@ -311,12 +313,12 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your UserID
+          description: Your ID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
         - in: path
-          name: UserID
+          name: ID
           description: Follower to remove
           required: true
           schema:
@@ -343,10 +345,10 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your UserID
+          description: Your ID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
       requestBody:
         content:
           application/json:
@@ -431,7 +433,7 @@ paths:
           description: Your session cookie
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
         - in: path
           name: postID
           required: true
@@ -463,10 +465,10 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your UserID
+          description: Your ID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
       responses:
         '200':
           description: Operation successful
@@ -491,10 +493,10 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your UserID
+          description: Your ID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
         - in: path
           name: postID
           required: true
@@ -526,10 +528,10 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your UserID
+          description: Your ID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
         - in: path
           name: postID
           required: true
@@ -564,10 +566,10 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your UserID
+          description: Your ID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
         - in: path
           name: postID
           required: true
@@ -627,10 +629,10 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your UserID
+          description: Your ID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
         - in: path
           name: commentID
           required: true
@@ -662,10 +664,10 @@ paths:
       parameters:
         - in: path
           name: userID
-          description: Your UserID
+          description: Your ID
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
         - in: path
           name: commentID
           required: true
@@ -695,10 +697,10 @@ paths:
       parameters:
       - in: path
         name: userID
-        description: Your UserID
+        description: Your ID
         required: true
         schema:
-          $ref: '#/components/schemas/UserID'
+          $ref: '#/components/schemas/ID'
       - in: path
         name: commentID
         required: true
@@ -728,7 +730,7 @@ paths:
           description: Your search query
           required: true
           schema:
-            $ref: '#/components/schemas/UserID'
+            $ref: '#/components/schemas/ID'
       responses:
         '200':
           description: Successful operation
@@ -760,18 +762,11 @@ components:
       minimum: 0
       example: 80
 
-    UserID:
-      type: string
-      pattern: "^[A-z0-9_.-]{3,127}$"
-      description: A valid UserID, case-insensitive
-      minLength: 3
-      maxLength: 127
-      example: user123
-
     Username:
       type: string
       example: Maria
       pattern: 'ˆ.*?$'
+      description: Case-insensitive username
       minLength: 3
       maxLength: 40
 
@@ -793,8 +788,8 @@ components:
       type: object
       description: A JSON representing a user account
       properties:
-        UserID:
-          $ref: '#/components/schemas/UserID'
+        ID:
+          $ref: '#/components/schemas/ID'
         proPicB64:
           $ref: '#/components/schemas/B64Image'
         followers:
@@ -814,7 +809,7 @@ components:
         postID:
           $ref: '#/components/schemas/ID'
         author:
-          $ref: '#/components/schemas/UserID'
+          $ref: '#/components/schemas/ID'
         pubTime:
           type: string
           format: date-time
@@ -844,7 +839,7 @@ components:
       type: array
       description: A list of users
       items:
-        $ref: '#/components/schemas/UserID'
+        $ref: '#/components/schemas/ID'
 
     Comment:
       type: object
@@ -853,7 +848,7 @@ components:
         id:
           $ref: '#/components/schemas/ID'
         author:
-          $ref: '#/components/schemas/UserID'
+          $ref: '#/components/schemas/ID'
         likes:
           $ref: '#/components/schemas/Counter'
         content:

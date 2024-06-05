@@ -67,20 +67,21 @@ type Comment struct {
 
 // Custom errors
 var (
-	ErrUserNotFound      = errors.New("error: user does not exist")
-	ErrAlreadyBlocked    = errors.New("error: user is already blocked")
-	ErrPostNotFound      = errors.New("error: post does not exist")
-	ErrUserIsBlocked     = errors.New("error: user is blocked")
-	ErrUserNotBlocked    = errors.New("error: user is not blocked")
-	ErrCommentNotFound   = errors.New("error: comment not found")
-	ErrUserAlreadyExists = errors.New("error: user already exists")
-	ErrNotFollowing      = errors.New("cannot unfollow user: is not followed")
-	ErrAlreadyFollowing  = errors.New("error: already following")
-	ErrDidNotLike        = errors.New("error: user did not like post/comment")
-	ErrBadImage          = errors.New("error: bad image")
-	ErrUserIsNotAuthor   = errors.New("error: you cannot delete somebody else's post")
-	ErrAlreadyLiked      = errors.New("already liked")
-	ErrBadCharset        = errors.New("bad charset")
+	ErrUserNotFound         = errors.New("error: user does not exist")
+	ErrAlreadyBlocked       = errors.New("error: user is already blocked")
+	ErrPostNotFound         = errors.New("error: post does not exist")
+	ErrUserIsBlocked        = errors.New("error: user is blocked")
+	ErrUserNotBlocked       = errors.New("error: user is not blocked")
+	ErrCommentNotFound      = errors.New("error: comment not found")
+	ErrUserAlreadyExists    = errors.New("error: user already exists")
+	ErrNotFollowing         = errors.New("cannot unfollow user: is not followed")
+	ErrAlreadyFollowing     = errors.New("error: already following")
+	ErrDidNotLike           = errors.New("error: user did not like post/comment")
+	ErrBadImage             = errors.New("error: bad image")
+	ErrUserIsNotAuthor      = errors.New("error: you cannot delete somebody else's post")
+	ErrAlreadyLiked         = errors.New("already liked")
+	ErrBadCharset           = errors.New("bad charset")
+	ErrUsernameAlreadyTaken = errors.New("username already taken")
 )
 
 // AppDatabase is the high level interface for the DB
@@ -90,6 +91,7 @@ type AppDatabase interface {
 	UsernameTaken(login string) (bool, error)
 	RegisterUser(username string) (int64, error)
 	SetProPic(userID int64, imgB64 string) error
+	SetUsername(userID int64, username string) error
 	Follows(follower int64, following int64) (bool, error)
 	Follow(follower int64, toFollow int64) error
 	Unfollow(follower int64, toUnfollow int64) error
