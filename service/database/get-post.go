@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"encoding/base64"
+	"errors"
 	"io/ioutil"
 	"time"
 )
@@ -12,7 +13,7 @@ func (db *appdbimpl) GetPost(id int64, postid int64) (Post, error) {
 	var imgPath string
 	var pubts time.Time
 	err := db.c.QueryRow("select * from Posts where postID = ?", postid).Scan(&p.PostID, &imgPath, &pubts, &p.Author, &p.Caption)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return p, ErrPostNotFound
 	} else if err != nil {
 		return p, err
@@ -27,7 +28,7 @@ func (db *appdbimpl) GetPost(id int64, postid int64) (Post, error) {
 
 	p.PubTime = pubts.Format(time.RFC3339)
 	q, err := db.c.Query("select user from LikesP where post = ?", postid)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return p, err
 	}
 	p.Likes = make([]string, 0)
@@ -41,7 +42,7 @@ func (db *appdbimpl) GetPost(id int64, postid int64) (Post, error) {
 	}
 
 	q, err = db.c.Query("select commentID from Comments where post = ?", postid)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return p, err
 	}
 	p.Comments = make([]int64, 0)

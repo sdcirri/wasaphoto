@@ -40,11 +40,11 @@ func (rt *_router) rmFollower(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 	err = rt.db.RmFollower(token, toRm)
-	if err == database.ErrUserNotFound {
+	if errors.Is(err, database.ErrUserNotFound) {
 		http.Error(w, "Error: no such user", http.StatusNotFound)
-	} else if err == database.ErrNotFollowing {
+	} else if errors.Is(err, database.ErrNotFollowing) {
 		http.Error(w, "Error: user does not follow you!", http.StatusNotFound)
-	} else if err == database.ErrAlreadyFollowing {
+	} else if errors.Is(err, database.ErrAlreadyFollowing) {
 		http.Error(w, "Bad request: already following", http.StatusBadRequest)
 	} else if err != nil {
 		rt.internalServerError(err, w)

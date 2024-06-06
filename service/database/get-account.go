@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"encoding/base64"
+	"errors"
 	"os"
 )
 
@@ -15,7 +16,7 @@ func (db *appdbimpl) GetAccount(id int64, userID int64) (Account, error) {
 	}
 	if exists {
 		blocked, err := db.IsBlockedBy(id, userID)
-		if err != nil && err != ErrUserNotFound {
+		if err != nil && !errors.Is(err, ErrUserNotFound) {
 			return a, err
 		}
 		if blocked {
@@ -30,14 +31,14 @@ func (db *appdbimpl) GetAccount(id int64, userID int64) (Account, error) {
 		return a, err
 	}
 	err = db.c.QueryRow("select count(*) from Follows where following = ?", userID).Scan(&a.Followers)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		a.Followers = 0
 	} else if err != nil {
 		return a, err
 	}
 
 	err = db.c.QueryRow("select count(*) from Follows where follower = ?", userID).Scan(&a.Following)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		a.Following = 0
 	} else if err != nil {
 		return a, err
@@ -45,7 +46,7 @@ func (db *appdbimpl) GetAccount(id int64, userID int64) (Account, error) {
 
 	a.Posts = make([]int64, 0)
 	q, err := db.c.Query("select postID from Posts where author = ?", userID)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return a, err
 	}
 	for q.Next() {

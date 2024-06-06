@@ -51,7 +51,7 @@ func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 	post, err := rt.db.GetPost(token, postID)
-	if err == database.ErrUserNotFound {
+	if errors.Is(err, database.ErrUserNotFound) {
 		http.Error(w, "Bad authentication token", http.StatusBadRequest)
 	} else if errors.Is(err, database.ErrPostNotFound) {
 		http.Error(w, database.ErrPostNotFound.Error(), http.StatusNotFound)

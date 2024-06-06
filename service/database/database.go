@@ -200,7 +200,10 @@ func New(db *sql.DB, installRoot string) (AppDatabase, error) {
 	for _, s := range tables {
 		_, err = migration.Exec(s)
 		if err != nil {
-			migration.Rollback()
+			err2 := migration.Rollback()
+			if err2 != nil {
+				return nil, err2
+			}
 			return nil, err
 		}
 	}

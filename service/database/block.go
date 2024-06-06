@@ -21,14 +21,20 @@ func (db *appdbimpl) Block(user int64, toBlock int64) error {
 	}
 	_, err = rmf_and_block.Exec("insert into Blocks values (?, ?)", user, toBlock)
 	if err != nil {
-		rmf_and_block.Rollback()
+		err2 := rmf_and_block.Rollback()
+		if err2 != nil {
+			return err2
+		}
 		return err
 	}
 	_, err = rmf_and_block.Exec("delete from Follows where following = ? and follower = ?", user, toBlock)
 	if err != nil {
-		rmf_and_block.Rollback()
+		err2 := rmf_and_block.Rollback()
+		if err2 != nil {
+			return err2
+		}
 		return err
 	}
-	rmf_and_block.Commit()
-	return nil
+	err = rmf_and_block.Commit()
+	return err
 }

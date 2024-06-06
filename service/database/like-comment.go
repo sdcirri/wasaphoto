@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/mattn/go-sqlite3"
 )
@@ -17,7 +18,7 @@ func (db *appdbimpl) LikeComment(user int64, commentID int64) error {
 
 	var oc int64
 	err = db.c.QueryRow("select author from Comments where commentID = ?", commentID).Scan(&oc)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return ErrCommentNotFound
 	} else if err != nil {
 		return err
