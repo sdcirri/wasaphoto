@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/sdgondola/wasaphoto/service/database"
 )
 
 type UserInfo struct {
@@ -21,10 +22,17 @@ func (rt *_router) login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		err = json.NewDecoder(r.Body).Decode(&info)
 		if err != nil {
 			rt.internalServerError(err, w)
+			return
 		}
-
 		userID, err = rt.db.RegisterUser(info.Username)
-		if err != nil {
+		if errors.Is(err, database.ErrUserAlreadyExists) {
+			res, err := rt.db.SearchUser(info.Username)
+			if err != nil {
+				rt.internalServerError(err, w)
+				return
+			}
+			userID = res[0]
+		} else if err != nil {
 			rt.internalServerError(err, w)
 			return
 		}
@@ -38,10 +46,11 @@ func (rt *_router) login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		Value: strconv.FormatInt(userID, 10),
 		Path:  "/",
 	})
-	w.Header().Set("content-type", "text-plain")
+	w.Header().Set("content-type", "text/plain")
 	_, err = w.Write([]byte(strconv.FormatInt(userID, 10)))
 	if err != nil {
 		rt.internalServerError(err, w)
 		return
 	}
 }
+
