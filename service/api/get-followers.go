@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/sdgondola/wasaphoto/service/database"
@@ -20,7 +21,9 @@ func (rt *_router) getFollowers(w http.ResponseWriter, r *http.Request, ps httpr
 	} else if err != nil {
 		rt.internalServerError(err, w)
 		return
-	} else if token != ps.ByName("userID") {
+	}
+	userID, err := strconv.ParseInt(ps.ByName("userID"), 64, 10)
+	if err != nil || token != userID {
 		http.Error(w, "Forbidden: cannot view somebody else's followers", http.StatusForbidden)
 		return
 	}

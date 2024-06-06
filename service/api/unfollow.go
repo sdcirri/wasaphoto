@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/sdgondola/wasaphoto/service/database"
@@ -20,17 +21,14 @@ func (rt *_router) unfollow(w http.ResponseWriter, r *http.Request, ps httproute
 		rt.internalServerError(err, w)
 		return
 	}
-	follower := ps.ByName("userID")
-	if follower == "" {
-		http.Error(w, "Bad request: no userID provided", http.StatusBadRequest)
-		return
-	} else if follower != token {
-		http.Error(w, "Bad request: bad userID", http.StatusBadRequest)
+	follower, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
+	if err != nil || follower != token {
+		http.Error(w, "Bad userID", http.StatusBadRequest)
 		return
 	}
-	toUnfollow := ps.ByName("userID")
-	if toUnfollow == "" {
-		http.Error(w, "Bad request: no userID provided", http.StatusBadRequest)
+	toUnfollow, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
+	if err != nil {
+		http.Error(w, "Bad userID", http.StatusBadRequest)
 		return
 	}
 	if toUnfollow == token {
@@ -39,13 +37,13 @@ func (rt *_router) unfollow(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 	err = rt.db.Unfollow(token, toUnfollow)
 	if errors.Is(err, database.ErrUserNotFound) {
-		http.Error(w, "Bad request: no such user", http.StatusBadRequest)
+		http.Error(w, database.ErrUserNotFound.Error(), http.StatusNotFound)
 	} else if errors.Is(err, database.ErrUserIsBlocked) {
 		http.Error(w, "Forbidden: user blocked you!", http.StatusForbidden)
 	} else if errors.Is(err, database.ErrNotFollowing) {
-		http.Error(w, "Bad request: not following", http.StatusBadRequest)
+		http.Error(w, database.ErrNotFollowing.Error(), http.StatusNotFound)
 	} else if err != nil {
-		http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
+		rt.internalServerError(err, w)
 	} else {
 		w.WriteHeader(http.StatusNoContent)
 	}

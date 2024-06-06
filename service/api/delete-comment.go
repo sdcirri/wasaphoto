@@ -21,7 +21,12 @@ func (rt *_router) deleteComment(w http.ResponseWriter, r *http.Request, ps http
 		rt.internalServerError(err, w)
 		return
 	}
-	if token != ps.ByName("userID") {
+	userID, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
+	if err != nil {
+		http.Error(w, "Bad userID", http.StatusBadRequest)
+		return
+	}
+	if token != userID {
 		http.Error(w, "Error: trying to delete somebody else's comment", http.StatusForbidden)
 		return
 	}
@@ -33,7 +38,7 @@ func (rt *_router) deleteComment(w http.ResponseWriter, r *http.Request, ps http
 
 	err = rt.db.DeleteComment(token, commentID)
 	if errors.Is(err, database.ErrUserNotFound) {
-		http.Error(w, "Bad request: no such user", http.StatusBadRequest)
+		http.Error(w, "Bad auth token", http.StatusBadRequest)
 	} else if errors.Is(err, database.ErrUserIsNotAuthor) {
 		http.Error(w, "Error: trying to delete somebody else's comment", http.StatusForbidden)
 	} else if errors.Is(err, database.ErrCommentNotFound) {

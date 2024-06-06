@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/sdgondola/wasaphoto/service/database"
@@ -20,13 +21,18 @@ func (rt *_router) rmFollower(w http.ResponseWriter, r *http.Request, ps httprou
 		rt.internalServerError(err, w)
 		return
 	}
-	if token != ps.ByName("userID") {
+	userID, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
+	if err != nil {
+		http.Error(w, "Bad userID", http.StatusBadRequest)
+		return
+	}
+	if token != userID {
 		http.Error(w, "Forbidden: cannot delete somebosy else's followers", http.StatusForbidden)
 		return
 	}
-	toRm := ps.ByName("userID")
-	if toRm == "" {
-		http.Error(w, "Bad request: no userID provided", http.StatusBadRequest)
+	toRm, err := strconv.ParseInt(ps.ByName("toRemoveID"), 10, 64)
+	if err != nil {
+		http.Error(w, "Bad userID", http.StatusBadRequest)
 		return
 	}
 	if toRm == token {

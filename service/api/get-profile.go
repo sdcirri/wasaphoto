@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/sdgondola/wasaphoto/service/database"
@@ -23,7 +24,11 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	toView := ps.ByName("userID")
+	toView, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
+	if err != nil {
+		http.Error(w, "Bad userID", http.StatusBadRequest)
+		return
+	}
 	profile, err := rt.db.GetAccount(token, toView)
 	if errors.Is(err, database.ErrUserIsBlocked) {
 		http.Error(w, "Forbidden: user blocked you!", http.StatusForbidden)

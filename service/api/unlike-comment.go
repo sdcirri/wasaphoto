@@ -21,13 +21,18 @@ func (rt *_router) unlikeComment(w http.ResponseWriter, r *http.Request, ps http
 		rt.internalServerError(err, w)
 		return
 	}
-	if token != ps.ByName("userID") {
-		http.Error(w, "Error: trying to like as somebody else", http.StatusForbidden)
+	userID, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
+	if err != nil {
+		http.Error(w, "Bad userID", http.StatusBadRequest)
+		return
+	}
+	if token != userID {
+		http.Error(w, "Error: trying to unlike as somebody else", http.StatusForbidden)
 		return
 	}
 	commentID, err := strconv.ParseInt(ps.ByName("commentID"), 10, 64)
 	if err != nil {
-		http.Error(w, "Bad comment ID: "+ps.ByName("commentID"), http.StatusBadRequest)
+		http.Error(w, "Bad commentID", http.StatusBadRequest)
 		return
 	}
 

@@ -21,7 +21,12 @@ func (rt *_router) likeComment(w http.ResponseWriter, r *http.Request, ps httpro
 		rt.internalServerError(err, w)
 		return
 	}
-	if token != ps.ByName("userID") {
+	userID, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
+	if err != nil {
+		http.Error(w, "Bad userID", http.StatusBadRequest)
+		return
+	}
+	if token != userID {
 		http.Error(w, "Error: trying to like as somebody else", http.StatusForbidden)
 		return
 	}

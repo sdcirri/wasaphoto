@@ -16,7 +16,7 @@ type PostFE struct {
 	ImageB64  string  `json:"imageB64"`
 	PubTime   string  `json:"pubTime"`
 	Caption   string  `json:"caption"`
-	Author    string  `json:"author"`
+	Author    int64   `json:"author"`
 	LikeCount int     `json:"likeCount"`
 	Comments  []int64 `json:"comments"`
 }

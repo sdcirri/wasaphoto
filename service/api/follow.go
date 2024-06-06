@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/sdgondola/wasaphoto/service/database"
@@ -20,17 +21,14 @@ func (rt *_router) follow(w http.ResponseWriter, r *http.Request, ps httprouter.
 		rt.internalServerError(err, w)
 		return
 	}
-	follower := ps.ByName("userID")
-	if follower == "" {
-		http.Error(w, "Bad request: no userID provided", http.StatusBadRequest)
-		return
-	} else if follower != token {
-		http.Error(w, "Bad request: bad userID", http.StatusBadRequest)
+	follower, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
+	if err != nil || follower != token {
+		http.Error(w, "Bad userID", http.StatusBadRequest)
 		return
 	}
-	toFollow := ps.ByName("userID")
-	if toFollow == "" {
-		http.Error(w, "Bad request: no userID provided", http.StatusBadRequest)
+	toFollow, err := strconv.ParseInt(ps.ByName("toFollowID"), 10, 64)
+	if err != nil {
+		http.Error(w, "Bad userID", http.StatusBadRequest)
 		return
 	}
 	if toFollow == token {
@@ -49,7 +47,7 @@ func (rt *_router) follow(w http.ResponseWriter, r *http.Request, ps httprouter.
 	} else {
 		w.WriteHeader(http.StatusCreated)
 		w.Header().Set("content-type", "text/plain")
-		_, err = w.Write([]byte(toFollow))
+		_, err = w.Write([]byte(ps.ByName("toFollowID")))
 		if err != nil {
 			rt.internalServerError(err, w)
 		}

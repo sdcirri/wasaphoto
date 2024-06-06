@@ -23,13 +23,13 @@ func (rt *_router) block(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 	blocker, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
 	if err != nil || blocker != token {
-		http.Error(w, "Bad request: bad userID", http.StatusBadRequest)
+		http.Error(w, "Bad userID", http.StatusBadRequest)
 		return
 	}
 
-	toBlock, err := strconv.ParseInt(ps.ByName("userIDToBlock"), 10, 64)
+	toBlock, err := strconv.ParseInt(ps.ByName("toBlockID"), 10, 64)
 	if err != nil {
-		http.Error(w, "Bad request: bad userID", http.StatusBadRequest)
+		http.Error(w, "Baad userID", http.StatusBadRequest)
 		return
 	}
 	if toBlock == token {

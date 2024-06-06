@@ -105,7 +105,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ID'
         '400':
-          description: Bad image
+          description: Bad image or bad userID
         '401':
           description: Unauthenticated
         '403':
@@ -135,14 +135,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Account'
         '400':
-          description: Bad auth token
+          description: Bad auth token or bad userID
         '403':
           description: 'Forbidden: user blocked you!'
         '404':
           description: User not found
 
-  /users/{userID}/follow/{ID}:
-    put:
+  /users/{userID}/follow/{toFollowID}:
+    post:
       tags:
         - Followers
       summary: Follow user
@@ -156,7 +156,7 @@ paths:
           schema:
             $ref: '#/components/schemas/ID'
         - in: path
-          name: ID
+          name: toFollowID
           description: User to follow
           required: true
           schema:
@@ -169,7 +169,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ID'
         '400':
-          description: bad auth token, already following or trying to follow yourself
+          description: bad auth token, bad userID, already following or trying to follow yourself
         '401':
           description: Unauthenticated
         '403':
@@ -177,7 +177,7 @@ paths:
         '404':
           description: User not found
 
-  /users/{userID}/unfollow/{ID}:
+  /users/{userID}/unfollow/{toUnfollowID}:
     delete:
       tags:
         - Followers
@@ -192,23 +192,23 @@ paths:
           schema:
             $ref: '#/components/schemas/ID'
         - in: path
-          name: ID
+          name: toUnfollowID
           description: User to unfollow
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ID'
       responses:
         '204':
-          description: successful operation
+          description: Successful operation
         '400':
-          description: Bad auth token, not following or trying to unfollow yourself
+          description: Bad auth token, bad userID or trying to unfollow yourself
         '401':
           description: Unauthenticated
         '404':
           description: User not found or not following
 
-  /users/{userID}/block/{ID}:
-    put:
+  /users/{userID}/block/{toBlockID}:
+    post:
       tags:
         - Followers
       summary: Block user
@@ -224,7 +224,7 @@ paths:
           schema:
             $ref: '#/components/schemas/ID'
         - in: path
-          name: ID
+          name: toBlockID
           description: User to block
           required: true
           schema:
@@ -237,13 +237,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ID'
         '400':
-          description: Bad auth token, already blocked or trying to block yourself
+          description: Bad auth token, bad userID, already blocked or trying to block yourself
         '401':
           description: Unauthenticated
         '404':
           description: User not found
 
-  /users/{userID}/unblock/{ID}:
+  /users/{userID}/unblock/{toUnblockID}:
     delete:
       tags:
         - Followers
@@ -258,7 +258,7 @@ paths:
           schema:
             $ref: '#/components/schemas/ID'
         - in: path
-          name: ID
+          name: toUnblockID
           description: User to unblock
           required: true
           schema:
@@ -267,11 +267,11 @@ paths:
         '204':
           description: Successful operation
         '400':
-          description: Bad auth token, not blocked or trying to unblock yourself
+          description: Bad auth token, bad userID or trying to unblock yourself
         '401':
           description: Unauthenticated
         '404':
-          description: User not found
+          description: User not found or not blocked
 
   /users/{userID}/followers:
     get:
@@ -303,7 +303,7 @@ paths:
         '403':
           description: "Forbidden: cannot view somebody else's followers"
 
-  /users/{userID}/followers/{ID}/remove:
+  /users/{userID}/followers/{toRemoveID}/remove:
     delete:
       tags:
         - Followers
@@ -318,11 +318,11 @@ paths:
           schema:
             $ref: '#/components/schemas/ID'
         - in: path
-          name: ID
+          name: toRemoveID
           description: Follower to remove
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/ID'
       responses:
         '204':
           description: Successful operation
@@ -362,7 +362,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ID'
         '400':
-          description: Bad auth token, malformed JSON, image too big or caption too long
+          description: Bad auth token or userID, malformed JSON, image too big or caption too long
         '401':
           description: Unauthenticated
         '403':
@@ -681,11 +681,11 @@ paths:
               schema:
                 type: integer
         '400':
-          description: Bad authentication token, bad comment ID or comment wasn't liked
+          description: Bad authentication token, userID or comment ID
         '401':
           description: Unauthenticated
         '404':
-          description: Comment not found
+          description: Comment not found or comment wasn't liked
 
   /comments/{commentID}/delete/{userID}:
     delete:

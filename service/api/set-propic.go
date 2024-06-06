@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/sdgondola/wasaphoto/service/database"
@@ -21,7 +22,11 @@ func (rt *_router) setProPic(w http.ResponseWriter, r *http.Request, ps httprout
 		rt.internalServerError(err, w)
 		return
 	}
-	userID := ps.ByName("userID")
+	userID, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
+	if err != nil {
+		http.Error(w, "Bad userID", http.StatusBadRequest)
+		return
+	}
 	if userID != token {
 		http.Error(w, "Error: you cannot set somebody else's profile picture", http.StatusForbidden)
 		return
@@ -44,7 +49,7 @@ func (rt *_router) setProPic(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	w.Header().Set("content-type", "text/plain")
-	_, err = w.Write([]byte(userID))
+	_, err = w.Write([]byte(ps.ByName("userID"))) // We spare to use strconv.FormatInt()
 	if err != nil {
 		rt.internalServerError(err, w)
 	}
