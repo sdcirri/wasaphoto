@@ -20,6 +20,10 @@ func (db *appdbimpl) GetFeed(user int64) ([]int64, error) {
 	}
 	for q.Next() {
 		var p int64
+		err = q.Err()
+		if err != nil {
+			return feed, err
+		}
 		err := q.Scan(&p)
 		if err != nil {
 			return feed, err

@@ -57,7 +57,7 @@ paths:
         - Login
       summary: Sets the username
       description: Changes the logged in user's username. Returns the same username on success
-      operationId: setMyUsername
+      operationId: setMyUserName
       parameters:
         - in: query
           name: username
@@ -120,7 +120,7 @@ paths:
         Returns information about a user (follower count, following count, profile picture (B64-encoded!) and posts)
         You need to be logged in (provide a valid auth token) in order to view posts. Otherwise, the 'posts' property
         will be empty
-      operationId: getProfile
+      operationId: getUserProfile
       parameters:
         - in: path
           name: userID
@@ -362,7 +362,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ID'
         '400':
-          description: Bad auth token or userID, malformed JSON, image too big or caption too long
+          description: Bad auth token or userID, malformed post object, image too big or caption too long
         '401':
           description: Unauthenticated
         '403':
@@ -779,14 +779,14 @@ components:
     LargeText:
       type: string
       description: A large text, used in post captions and comments
-      pattern: 'ˆ.*?$'
+      pattern: '^.*?$'
       minLength: 0
       maxLength: 2048
       example: Currently working on WASAPhoto!
 
     Account:
       type: object
-      description: A JSON representing a user account
+      description: An object representing a user account
       properties:
         ID:
           $ref: '#/components/schemas/ID'
@@ -804,7 +804,7 @@ components:
 
     Post:
       type: object
-      description: A JSON representing a post
+      description: An object representing a post
       properties:
         postID:
           $ref: '#/components/schemas/ID'
@@ -827,7 +827,7 @@ components:
     PostParams:
       type: object
       description: |-
-        A JSON containing all the required parameters
+        An object containing all the required parameters
         to ask the backend to create a new post
       properties:
         image:
@@ -843,7 +843,7 @@ components:
 
     Comment:
       type: object
-      description: A JSON representing a comment
+      description: An object representing a comment
       properties:
         id:
           $ref: '#/components/schemas/ID'

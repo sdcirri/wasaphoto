@@ -51,6 +51,10 @@ func (db *appdbimpl) GetAccount(id int64, userID int64) (Account, error) {
 	}
 	for q.Next() {
 		var post int64
+		err = q.Err()
+		if err != nil {
+			return a, err
+		}
 		err = q.Scan(&post)
 		if err != nil {
 			return a, err

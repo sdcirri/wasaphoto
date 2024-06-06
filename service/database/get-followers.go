@@ -15,6 +15,10 @@ func (db *appdbimpl) GetFollowers(id int64) ([]int64, error) {
 	}
 	for q.Next() {
 		var f int64
+		err = q.Err()
+		if err != nil {
+			return followers, err
+		}
 		err = q.Scan(&f)
 		if err != nil {
 			return followers, err

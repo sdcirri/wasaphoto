@@ -34,6 +34,10 @@ func (db *appdbimpl) GetPost(id int64, postid int64) (Post, error) {
 	p.Likes = make([]string, 0)
 	for q.Next() {
 		var like string
+		err = q.Err()
+		if err != nil {
+			return p, err
+		}
 		err = q.Scan(&like)
 		if err != nil {
 			return p, err
@@ -48,6 +52,10 @@ func (db *appdbimpl) GetPost(id int64, postid int64) (Post, error) {
 	p.Comments = make([]int64, 0)
 	for q.Next() {
 		var com int64
+		err = q.Err()
+		if err != nil {
+			return p, err
+		}
 		err = q.Scan(&com)
 		if err != nil {
 			return p, err

@@ -39,10 +39,6 @@ func (db *appdbimpl) NewPost(op int64, imgB64 string, caption string) (int64, er
 	}
 	res, err := ins.Exec("", globaltime.Now(), op, caption)
 	if err != nil {
-		postID, err2 := res.LastInsertId()
-		if err2 == nil {
-			del.Exec(postID)
-		}
 		return 0, err
 	}
 	postID, err := res.LastInsertId()
@@ -62,17 +58,26 @@ func (db *appdbimpl) NewPost(op int64, imgB64 string, caption string) (int64, er
 	jpegOptions := &jpeg.Options{Quality: 85}
 	err = jpeg.Encode(imgFile, img, jpegOptions)
 	if err != nil {
-		del.Exec(postID)
+		_, err2 := del.Exec(postID)
+		if err2 != nil {
+			return 0, err2
+		}
 		return 0, err
 	}
 	insImg, err := db.c.Prepare("update Posts set img_path = ? where postID = ?")
 	if err != nil {
-		del.Exec(postID)
+		_, err2 := del.Exec(postID)
+		if err2 != nil {
+			return 0, err2
+		}
 		return 0, err
 	}
 	_, err = insImg.Exec(imgPath, postID)
 	if err != nil {
-		del.Exec(postID)
+		_, err2 := del.Exec(postID)
+		if err2 != nil {
+			return 0, err2
+		}
 		return 0, err
 	}
 	return postID, nil

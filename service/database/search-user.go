@@ -8,6 +8,10 @@ func (db *appdbimpl) SearchUser(query string) ([]int64, error) {
 	}
 	for q.Next() {
 		var u int64
+		err = q.Err()
+		if err != nil {
+			return res, err
+		}
 		err = q.Scan(&u)
 		if err != nil {
 			return res, err
