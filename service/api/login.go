@@ -53,4 +53,3 @@ func (rt *_router) login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 }
-

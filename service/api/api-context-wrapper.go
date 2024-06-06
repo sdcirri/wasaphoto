@@ -1,9 +1,9 @@
 package api
 
 import (
-	"github.com/sdgondola/wasaphoto/service/api/reqcontext"
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
+	"github.com/sdgondola/wasaphoto/service/api/reqcontext"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
