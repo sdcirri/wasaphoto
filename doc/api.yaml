@@ -724,6 +724,7 @@ paths:
         - Followers
       summary: Search for users
       description: Search registered users on the website
+      operationId: searchUser
       parameters:
         - in: query
           name: q

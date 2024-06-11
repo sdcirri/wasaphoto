@@ -1,6 +1,8 @@
 <script>
 import { ref } from 'vue'
 
+import login from '../services/login'
+
 export default {
 	data: function() {
 		return {
@@ -10,22 +12,17 @@ export default {
 		}
 	},
 	methods: {
-		async login(username) {
+		login: async function() {
 			try {
-				let resp = await this.$axios.post("/session", {
-					"headers": { "content-type": "application/json" },
-					"name": username
-				});
-				this.userID = resp.data;
-				document.cookie = "WASASESSIONID=" + this.userID + "; path=/";
-				if (this.$router.options.history.state.back != null)
-					this.$router.back();
-				else this.$router.replace("/");
+				this.userID = await login(this.username);
+				if (this.$router.options.history.state.back == null)
+					this.$router.replace("/");
+				else this.$router.back();
 			}
 			catch (e) {
 				this.errormsg = e.toString();
 			}
-		},
+		}
 	},
 	mounted() {
 	}
@@ -44,8 +41,8 @@ export default {
 		</div>
 		<div
 			class="d-flex flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 centerDiv">
-			<input v-model="username" placeholder="username" @keyup.enter="login(username)"/>
-			<button type="button" class="btn btn-sm btn-outline-secondary" @click="login(username)">
+			<input v-model="username" placeholder="username" @keyup.enter="this.login()"/>
+			<button type="button" class="btn btn-sm btn-outline-secondary" @click="this.login()">
 				Login
 			</button>
 		</div>

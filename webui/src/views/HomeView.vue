@@ -1,5 +1,5 @@
 <script>
-import getLoginCookie from '../getLoginCookie'
+import getLoginCookie from '../services/getLoginCookie'
 
 export default {
 	data: function() {
@@ -12,27 +12,29 @@ export default {
 	},
 	methods: {
 		async refresh() {
-			this.loading = true;
-			this.errormsg = null;
-			try {
-				let response = await this.$axios.get(
-					"/feed/" + this.userID,
-					{
-						headers: { "authorization": "bearer " + this.userID },
-					});
-				this.postList = response.data;
-			} catch (e) {
-				this.errormsg = e.toString();
+			if (this.userID == null) {
+				this.userID = getLoginCookie();
+				if (this.userID == null)
+					this.$router.push("/login");
 			}
-			this.loading = false;
+			if (this.userID != null) {
+				this.loading = true;
+				this.errormsg = null;
+				try {
+					let response = await this.$axios.get(
+						"/feed/" + this.userID,
+						{
+							headers: { "authorization": "bearer " + this.userID },
+						});
+					this.postList = response.data;
+				} catch (e) {
+					this.errormsg = e.toString();
+				}
+				this.loading = false;
+			}
 		},
 	},
 	mounted() {
-		if (this.userID == null) {
-			this.userID = getLoginCookie();
-			if (this.userID == null)
-				this.$router.push("/login");
-		}
 		this.refresh()
 	}
 }

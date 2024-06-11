@@ -1,5 +1,8 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+
+import logout from './services/logout';
+
 </script>
 <script>
 export default {}
@@ -41,6 +44,12 @@ export default {}
 							<RouterLink to="/search" class="nav-link">
 								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
 								Search
+							</RouterLink>
+						</li>
+						<li class="nav-item">
+							<RouterLink to="/login" class="nav-link" @click="logout()">
+								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
+								Logout
 							</RouterLink>
 						</li>
 					</ul>

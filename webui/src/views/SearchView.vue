@@ -1,6 +1,8 @@
 <script>
 import { ref } from 'vue'
 
+import searchUser from '../services/searchUser';
+
 export default {
 	data: function() {
 		return {
@@ -10,25 +12,9 @@ export default {
 		}
 	},
 	methods: {
-		async getUsername(uid) {
+		async search() {
 			try {
-				let resp = await this.$axios.get("/users/" + uid, {});
-				return resp.data["username"];
-			}
-			catch (e) {
-				this.errormsg = e.toString();
-				return null;
-			}
-		},
-		async search(query) {
-			if (query == "") return;
-			try {
-				this.results = [];
-				let resp = await this.$axios.get("/searchUser?q=" + query, {});
-				for (let i = 0; i < resp.data.length; i++) {
-					let u = await this.getUsername(resp.data[i]);
-					this.results.push(u);
-				}
+				this.results = await searchUser(this.query);
 			}
 			catch (e) {
 				this.errormsg = e.toString();
@@ -48,8 +34,8 @@ export default {
 		</div>
 		<div
 			class="d-flex flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 centerDiv">
-			<input v-model="query" placeholder="type here to search" @input="search(query)"/>
-			<button type="button" class="btn btn-sm btn-outline-secondary" @click="search(query)">
+			<input v-model="query" placeholder="type here to search" @input="search()"/>
+			<button type="button" class="btn btn-sm btn-outline-secondary" @click="search()">
 				Search
 			</button>
 		</div>
