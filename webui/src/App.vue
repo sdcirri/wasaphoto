@@ -37,6 +37,12 @@ export default {}
 								My profile
 							</RouterLink>
 						</li>
+						<li class="nav-item">
+							<RouterLink to="/search" class="nav-link">
+								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
+								Search
+							</RouterLink>
+						</li>
 					</ul>
 				</div>
 			</nav>

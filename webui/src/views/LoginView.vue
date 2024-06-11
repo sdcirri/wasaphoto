@@ -12,7 +12,10 @@ export default {
 	methods: {
 		async login(username) {
 			try {
-				let resp = await this.$axios.post("/session", { "name": username }, { "content-type": "application/json" });
+				let resp = await this.$axios.post("/session", {
+					"headers": { "content-type": "application/json" },
+					"name": username
+				});
 				this.userID = resp.data;
 				document.cookie = "WASASESSIONID=" + this.userID + "; path=/";
 				if (this.$router.options.history.state.back != null)
@@ -41,7 +44,7 @@ export default {
 		</div>
 		<div
 			class="d-flex flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 centerDiv">
-			<input v-model="username" placeholder="username"/>
+			<input v-model="username" placeholder="username" @keyup.enter="login(username)"/>
 			<button type="button" class="btn btn-sm btn-outline-secondary" @click="login(username)">
 				Login
 			</button>
