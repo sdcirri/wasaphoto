@@ -21,12 +21,12 @@ func (rt *_router) unblock(w http.ResponseWriter, r *http.Request, ps httprouter
 		rt.internalServerError(err, w)
 		return
 	}
-	blocker, err := strconv.ParseInt(ps.ByName("userID"), 64, 10)
+	blocker, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
 	if err != nil || blocker != token {
 		http.Error(w, "Bad userID", http.StatusBadRequest)
 		return
 	}
-	toUnblock, err := strconv.ParseInt(ps.ByName("toUnblockID"), 64, 10)
+	toUnblock, err := strconv.ParseInt(ps.ByName("toUnblockID"), 10, 64)
 	if err != nil {
 		http.Error(w, "Bad userID", http.StatusBadRequest)
 		return

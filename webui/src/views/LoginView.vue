@@ -10,17 +10,19 @@ export default {
 		}
 	},
 	methods: {
-		login() {
-			console.log("Logging in as " + this.username);
+		async login(username) {
 			try {
-				let resp = this.$axios.post("/session", {"name": this.username});
+				let resp = await this.$axios.post("/session", { "name": username }, { "content-type": "application/json" });
 				this.userID = resp.data;
-				console.log("Got userID =", this.userID);
+				document.cookie = "WASASESSIONID=" + this.userID + "; path=/";
+				if (this.$router.options.history.state.back != null)
+					this.$router.back();
+				else this.$router.replace("/");
 			}
-			catch(e) {
+			catch (e) {
 				this.errormsg = e.toString();
 			}
-		}
+		},
 	},
 	mounted() {
 	}
@@ -34,7 +36,11 @@ export default {
 			<h1 class="h2">Login</h1>
 		</div>
 		<div
-			class="d-flex flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+			class="d-flex flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 centerDiv">
+			<h5>Login to continue to this site</h5>
+		</div>
+		<div
+			class="d-flex flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 centerDiv">
 			<input v-model="username" placeholder="username"/>
 			<button type="button" class="btn btn-sm btn-outline-secondary" @click="login(username)">
 				Login

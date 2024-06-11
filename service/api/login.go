@@ -41,11 +41,6 @@ func (rt *_router) login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		rt.internalServerError(err, w)
 		return
 	}
-	http.SetCookie(w, &http.Cookie{
-		Name:  "WASASESSIONID",
-		Value: strconv.FormatInt(userID, 10),
-		Path:  "/",
-	})
 	w.Header().Set("content-type", "text/plain")
 	_, err = w.Write([]byte(strconv.FormatInt(userID, 10)))
 	if err != nil {

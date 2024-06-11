@@ -58,3 +58,8 @@
 	stroke-linejoin: round;
 	fill: none;
 }
+
+.centerDiv {
+	display: flex;
+	justify-content: center;
+}

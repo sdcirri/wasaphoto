@@ -22,7 +22,7 @@ func (rt *_router) getFollowers(w http.ResponseWriter, r *http.Request, ps httpr
 		rt.internalServerError(err, w)
 		return
 	}
-	userID, err := strconv.ParseInt(ps.ByName("userID"), 64, 10)
+	userID, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
 	if err != nil || token != userID {
 		http.Error(w, "Forbidden: cannot view somebody else's followers", http.StatusForbidden)
 		return
