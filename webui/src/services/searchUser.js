@@ -9,7 +9,7 @@ export default async function searchUser(query) {
         let resp = await api.get(`/searchUser?q=${query}`, {});
         for (let i = 0; i < resp.data.length; i++) {
             let p = await getProfile(resp.data[i]);
-            results.push(p["username"]);
+            results.push(p);
         }
         return results;
     }

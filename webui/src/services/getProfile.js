@@ -5,7 +5,7 @@ import { BadIdsException, UserNotFoundException, InternalServerError } from './a
 
 export default async function getProfile(uid) {
     let auth = getLoginCookie();
-    let headers = (auth != null) ? { "authorization": `bearer ${uid}` } : {};
+    let headers = (auth != null) ? { "Authorization": `bearer ${uid}` } : {};
     try {
         let resp = await api.get(`/users/${uid}`, { "headers": headers });
         switch (resp.status) {
