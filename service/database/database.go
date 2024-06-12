@@ -96,6 +96,7 @@ type AppDatabase interface {
 	Follow(follower int64, toFollow int64) error
 	Unfollow(follower int64, toUnfollow int64) error
 	GetFollowers(id int64) ([]int64, error)
+	GetFollowing(id int64) ([]int64, error)
 	RmFollower(user int64, follower int64) error
 	Block(user int64, toBlock int64) error
 	Unblock(user int64, toUnblock int64) error

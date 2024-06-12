@@ -3,10 +3,10 @@ import api from './axios'
 import { BadFollowOperation, BadAuthException, InternalServerError, BlockedException, UserNotFoundException } from './apiErrors';
 import getLoginCookie from './getLoginCookie';
 
-export default async function follow(follower, toFollow) {
-    let uid = getLoginCookie();
+export default async function follow(toFollow) {
+    const uid = getLoginCookie();
     if (uid == null) throw new BadAuthException();
-    let resp = await api.post(`/users/${follower}/follow/${toFollow}`,
+    let resp = await api.post(`/users/${uid}/follow/${toFollow}`, {},
         { "headers": { "Authorization": `bearer ${uid}` } }
     );
     switch (resp.status) {

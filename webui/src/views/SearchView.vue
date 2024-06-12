@@ -8,7 +8,6 @@ export default {
 	data: function () {
 		return {
 			errormsg: null,
-			auth: getLoginCookie(),
 			query: ref(),
 			results: [],
 		}
@@ -40,7 +39,7 @@ export default {
 
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<ProCard v-for="profile in results" :key="profile.userID" :profile="profile" :auth="auth" />
+			<ProCard v-for="profile in results" :key="profile.userID" :profile="profile" />
 		</div>
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 	</div>

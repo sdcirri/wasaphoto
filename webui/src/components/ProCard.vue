@@ -1,44 +1,53 @@
 <script>
 
-import follow from '../services/follow'
+import follow from '../services/follow';
+import getFollowing from '../services/getFollowing';
+import getLoginCookie from '../services/getLoginCookie';
 
 export default {
     props: {
-        pprofile: {
+        profile: {
             type: Object,
             required: true
-        },
-        pauth: {
-            type: String,
-            required: true
-        },
+        }
     },
     data: function () {
         return {
             blobUrl: null,
-            // Deep copy props for operations
-            profile: JSON.parse(JSON.stringify(this.pprofile)),
-            auth: this.pauth
+            uid: null,
+            username: null,
+            proPicB64: null,
+            following: null,
+            auth: null
         }
     },
     methods: {
         proPic() {
-            const bin = window.atob(this.profile.proPicB64);
+            const bin = window.atob(this.proPicB64);
             const arrayBuffer = new ArrayBuffer(bin.length);
             const bytes = new Uint8Array(arrayBuffer);
             for (let i = 0; i < bin.length; i++)
                 bytes[i] = bin.charCodeAt(i);
             return new Blob([arrayBuffer], { type: "image/jpg" });
         },
-        async doFollow() {
-            await follow(this.auth, this.profile.userID);
+        async follow() {
+            await follow(this.uid);
+            await this.checkFollowing();
+        },
+        async checkFollowing() {
+            const followingList = await getFollowing();
+            this.following = followingList.some(id => id == this.uid);
         }
     },
-    mounted() {
+    async mounted() {
+        // Deep copy props for operations
+        this.uid = new Number(this.profile.userID);
+        this.username = this.profile.username;
+        this.proPicB64 = this.profile.proPicB64;
+        this.auth = getLoginCookie();
+        await this.checkFollowing();
         const blob = this.proPic();
         this.blobUrl = URL.createObjectURL(blob);
-        const btn = document.getElementById("followButton");
-        if (btn != null) btn.onclick = this.doFollow;
     },
     beforeDestroy() {
         URL.revokeObjectURL(this.blobUrl);
@@ -47,10 +56,10 @@ export default {
 </script>
 
 <template>
-    <div v-if="profile.userID != auth" class="proBox" id="container">
-        <img class="propic" :src="blobUrl" :alt="`${profile.username}'s profile picture`" />
-        <p class="spaced">{{ profile.username }} ({{ profile.userID }})</p>
-        <button id="followButton" v-if="auth != null">Follow</button>
+    <div v-if="uid != auth" class="proBox" id="container">
+        <img class="propic" :src="blobUrl" :alt="`${username}'s profile picture`" />
+        <p class="spaced">{{ username }}</p>
+        <button id="followButton" v-if="auth != null && !following" @click="this.follow">Follow</button>
         <br />
     </div>
 </template>
