@@ -2,7 +2,7 @@
 import getLoginCookie from '../services/getLoginCookie'
 
 export default {
-	data: function() {
+	data: function () {
 		return {
 			errormsg: null,
 			loading: false,
@@ -49,12 +49,11 @@ export default {
 		<div>
 			<p v-if="this.postList.length == 0">So empty! Add some new friends to view their photos!</p>
 			<ul>
-				<li v-for="postID in this.postList">postID</li>
+				<li v-for="postID in this.postList" v-bind:key="postID">postID</li>
 			</ul>
 		</div>
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 	</div>
 </template>
 
-<style>
-</style>
+<style></style>

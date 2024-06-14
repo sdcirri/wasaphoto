@@ -49,7 +49,7 @@ export default {
         const blob = this.proPic();
         this.blobUrl = URL.createObjectURL(blob);
     },
-    beforeDestroy() {
+    beforeUnmount() {
         URL.revokeObjectURL(this.blobUrl);
     }
 }
