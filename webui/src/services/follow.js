@@ -1,11 +1,11 @@
 import api from './axios'
 
-import { BadFollowOperation, BadAuthException, InternalServerError, BlockedException, UserNotFoundException } from './apiErrors';
-import getLoginCookie from './getLoginCookie';
+import { BadFollowOperation, BadAuthException, InternalServerError, BlockedException, UserNotFoundException } from './apiErrors'
+import getLoginCookie from './getLoginCookie'
 
 export default async function follow(toFollow) {
     const uid = getLoginCookie();
-    if (uid == null) throw new BadAuthException();
+    if (uid == null) throw BadAuthException;
     let resp = await api.post(`/users/${uid}/follow/${toFollow}`, {},
         { "headers": { "Authorization": `bearer ${uid}` } }
     );
@@ -13,14 +13,14 @@ export default async function follow(toFollow) {
         case 201:
             return;
         case 400:
-            throw new BadFollowOperation();
+            throw BadFollowOperation;
         case 401:
-            throw new BadAuthException();
+            throw BadAuthException;
         case 403:
-            throw new BlockedException();
+            throw BlockedException;
         case 404:
-            throw new UserNotFoundException();
+            throw UserNotFoundException;
         default:
-            throw new InternalServerError();
+            throw InternalServerError;
     }
 }

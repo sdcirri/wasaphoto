@@ -64,6 +64,7 @@ func (rt *_router) newPost(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
+	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("content-type", "text/plain")
 	_, err = w.Write([]byte(strconv.FormatInt(postID, 10)))
 	if err != nil {

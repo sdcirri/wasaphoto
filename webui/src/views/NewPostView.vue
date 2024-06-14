@@ -28,15 +28,20 @@ export default {
 		},
 		deleteImg() {
 			this.uploadB64 = null;
+			this.errormsg = null;
 		},
 		async publish() {
-			const stdEnc = this.uploadB64.split("base64,")[1];
-			try {
-				await newPost(stdEnc, this.caption);
+			const b64split = this.uploadB64.split("base64,");
+			if (!(new RegExp("^(data\:image\/)(jpeg|png)")).exec(b64split[0])) {
+				this.errormsg = "Error: invalid image type!";
+				return
 			}
+	//		try {
+				await newPost(b64split[1], this.caption);
+	/*		}
 			catch (e) {
 				this.errormsg = e;
-			}
+			}	*/
 		}
 	},
 	mounted() {

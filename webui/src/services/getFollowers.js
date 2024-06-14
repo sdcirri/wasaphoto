@@ -5,7 +5,7 @@ import getLoginCookie from './getLoginCookie';
 
 export default async function getFollowers() {
     let uid = getLoginCookie();
-    if (uid == null) throw new BadAuthException();
+    if (uid == null) throw BadAuthException;
     let resp = await api.get(`/users/${uid}/followers`, {},
         { "headers": { "Authorization": `bearer ${uid}` } }
     );
@@ -14,10 +14,10 @@ export default async function getFollowers() {
             return resp.data;
         case 400:
         case 401:
-            throw new BadAuthException();
+            throw BadAuthException;
         case 403:
-            throw new AccessDeniedException();
+            throw AccessDeniedException;
         default:
-            throw new InternalServerError();
+            throw InternalServerError;
     }
 }

@@ -45,11 +45,12 @@ func (db *appdbimpl) NewPost(op int64, imgB64 string, caption string) (int64, er
 	if err != nil {
 		return 0, err
 	}
-	err = os.MkdirAll(db.installRoot+"/posts", 0755)
+	userPostsDir := db.installRoot + "/" + strconv.FormatInt(op, 10) + "/posts"
+	err = os.MkdirAll(userPostsDir, 0755)
 	if err != nil {
 		return 0, err
 	}
-	imgPath := db.installRoot + "/" + strconv.FormatInt(op, 10) + "/posts/" + strconv.FormatInt(postID, 10) + ".jpg"
+	imgPath := userPostsDir + "/" + strconv.FormatInt(postID, 10) + ".jpg"
 	imgFile, err := os.Create(imgPath)
 	if err != nil {
 		return 0, err
