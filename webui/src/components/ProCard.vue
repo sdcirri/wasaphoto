@@ -59,7 +59,7 @@ export default {
     <div v-if="uid != auth" class="proBox" id="container">
         <img class="propic" :src="blobUrl" :alt="`${username}'s profile picture`" />
         <p class="spaced">{{ username }}</p>
-        <button id="followButton" v-if="auth != null && !following" @click="this.follow">Follow</button>
+        <button id="followButton" class="btn btn-sm btn-outline-primary" v-if="auth != null && !following" @click="this.follow">Follow</button>
         <br />
     </div>
 </template>
@@ -69,16 +69,17 @@ export default {
     display: flex;
     align-items: center;
     width: 100%;
-    height: 36px;
+    height: 10vh;
 }
 
 .propic {
-    width: 36px;
-    height: 36px;
+    width: 5vh;
+    height: 5vh;
 }
 
 .spaced {
-    margin-right: 12pt;
-    margin-left: 12pt;
+    margin-right: 2vh;
+    margin-left: 2vh;
+    font-size: 2vh;
 }
 </style>

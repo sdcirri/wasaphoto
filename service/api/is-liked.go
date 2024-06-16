@@ -1,15 +1,15 @@
 package api
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/sdgondola/wasaphoto/service/database"
 )
 
-func (rt *_router) getFeed(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) isLiked(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	token, err := rt.getAuthToken(r)
 	if errors.Is(err, ErrNoAuth) {
 		http.Error(w, "Unauthenticated", http.StatusUnauthorized)
@@ -21,19 +21,28 @@ func (rt *_router) getFeed(w http.ResponseWriter, r *http.Request, ps httprouter
 		rt.internalServerError(err, w)
 		return
 	}
-	feed, err := rt.db.GetFeed(token)
-	if errors.Is(err, database.ErrUserNotFound) {
+	userID, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
+	if err != nil || userID != token {
 		http.Error(w, "Bad authentication token", http.StatusUnauthorized)
-	} else if err != nil {
+		return
+	}
+	postID, err := strconv.ParseInt(ps.ByName("postID"), 10, 64)
+	if err != nil {
+		http.Error(w, database.ErrPostNotFound.Error(), http.StatusNotFound)
+		return
+	}
+	liked, err := rt.db.IsLiked(userID, postID)
+	if err != nil {
 		rt.internalServerError(err, w)
 	} else {
-		j, err := json.Marshal(feed)
-		if err != nil {
-			rt.internalServerError(err, w)
-			return
+		var body []byte
+		if liked {
+			body = []byte("true")
+		} else {
+			body = []byte("false")
 		}
-		w.Header().Set("content-type", "application/json")
-		_, err = w.Write(j)
+		w.Header().Set("content-type", "text/plain")
+		_, err = w.Write(body)
 		if err != nil {
 			rt.internalServerError(err, w)
 		}

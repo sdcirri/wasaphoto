@@ -4,7 +4,7 @@ import { BadAuthException, InternalServerError, AccessDeniedException } from './
 import getLoginCookie from './getLoginCookie';
 
 export default async function getFollowers() {
-    let uid = getLoginCookie();
+    const uid = getLoginCookie();
     if (uid == null) throw BadAuthException;
     let resp = await api.get(`/users/${uid}/followers`, {},
         { "headers": { "Authorization": `bearer ${uid}` } }

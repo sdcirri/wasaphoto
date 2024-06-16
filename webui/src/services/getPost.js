@@ -5,19 +5,22 @@ import {
     BadIdsException,
     BlockedException,
     UserNotFoundException,
-    InternalServerError
+    InternalServerError,
+    BadAuthException
 } from './apiErrors'
 
-export default async function getProfile(uid) {
-    const auth = getLoginCookie();
-    const headers = (auth != null) ? { "Authorization": `bearer ${uid}` } : {};
-    let resp = await api.get(`/users/${uid}`, { "headers": headers });
+export default async function getPost(pid) {
+    const uid = getLoginCookie();
+    if (uid == null) throw BadAuthException;
+    let resp = await api.get(`/posts/${pid}`, { "headers": { "Authorization": `bearer ${uid}` } });
     switch (resp.status) {
         case 200:
             return resp.data;
             break;
         case 400:
             throw BadIdsException;
+        case 401:
+            throw BadAuthException;
         case 403:
             throw BlockedException;
         case 404:

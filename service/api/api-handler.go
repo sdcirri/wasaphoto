@@ -23,6 +23,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/posts/:postID/delete", rt.rmPost)
 	rt.router.GET("/posts/:postID/likes", rt.getLikes)
 	rt.router.GET("/feed/:userID", rt.getFeed)
+	rt.router.GET("/posts/:postID/liked/:userID", rt.isLiked)
 	rt.router.PUT("/posts/:postID/like/:userID", rt.likePost)
 	rt.router.DELETE("/posts/:postID/unlike/:userID", rt.unlikePost)
 	rt.router.POST("/posts/:postID/comment/:userID", rt.commentPost)

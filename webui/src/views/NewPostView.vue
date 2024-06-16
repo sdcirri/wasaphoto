@@ -36,12 +36,8 @@ export default {
 				this.errormsg = "Error: invalid image type!";
 				return
 			}
-	//		try {
-				await newPost(b64split[1], this.caption);
-	/*		}
-			catch (e) {
-				this.errormsg = e;
-			}	*/
+			await newPost(b64split[1], this.caption);
+			this.$router.replace("/");
 		}
 	},
 	mounted() {

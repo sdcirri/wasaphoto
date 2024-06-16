@@ -4,6 +4,7 @@ import router from './router'
 import axios from './services/axios.js'
 import ErrorMsg from './components/ErrorMsg.vue'
 import ProCard from './components/ProCard.vue'
+import PostCard from './components/PostCard.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
 
 import './assets/dashboard.css'
@@ -13,6 +14,7 @@ const app = createApp(App);
 app.config.globalProperties.$axios = axios;
 app.component("ErrorMsg", ErrorMsg);
 app.component("ProCard", ProCard);
+app.component("PostCard", PostCard);
 app.component("LoadingSpinner", LoadingSpinner);
 app.use(router);
 app.mount('#app');
