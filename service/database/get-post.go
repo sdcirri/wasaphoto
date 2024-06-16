@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"errors"
-	"io/ioutil"
+	"os"
 	"time"
 )
 
@@ -63,7 +63,7 @@ func (db *appdbimpl) GetPost(id int64, postid int64) (Post, error) {
 		p.Comments = append(p.Comments, com)
 	}
 
-	imgRaw, err := ioutil.ReadFile(imgPath)
+	imgRaw, err := os.ReadFile(imgPath)
 	if err != nil {
 		return p, err
 	}
