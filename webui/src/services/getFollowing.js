@@ -1,13 +1,12 @@
 import api from './axios'
 
-import { BadAuthException, InternalServerError, AccessDeniedException } from './apiErrors';
-import getLoginCookie from './getLoginCookie';
+import { BadAuthException, InternalServerError, AccessDeniedException } from './apiErrors'
+import { authStatus } from './login'
 
 export default async function getFollowing() {
-    const uid = getLoginCookie();
-    if (uid == null) throw BadAuthException;
-    let resp = await api.get(`/users/${uid}/following`,
-        { "headers": { "Authorization": `bearer ${uid}` } }
+    if (authStatus.status == null) throw BadAuthException;
+    let resp = await api.get(`/users/${authStatus.status}/following`,
+        { "headers": { "Authorization": `bearer ${authStatus.status}` } }
     );
     switch (resp.status) {
         case 200:

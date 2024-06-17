@@ -4,13 +4,13 @@ import {
     InternalServerError,
     LikeImpersonationException
 } from './apiErrors';
-import getLoginCookie from './getLoginCookie';
+import { authStatus } from './login';
 import api from './axios'
 
 export default async function likePost(pid) {
-    const uid = getLoginCookie();
-    if (uid == null) throw BadAuthException;
-    let resp = await api.put(`/posts/${pid}/like/${uid}`, {}, { "headers": { "Authorization": `bearer ${uid}` } });
+    if (authStatus.status == null) throw BadAuthException;
+    let resp = await api.put(`/posts/${pid}/like/${authStatus.status}`, {},
+        { "headers": { "Authorization": `bearer ${authStatus.status}` } });
     switch (resp.status) {
         case 201:
             return;

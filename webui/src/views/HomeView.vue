@@ -1,5 +1,5 @@
 <script>
-import getLoginCookie from '../services/getLoginCookie'
+import { authStatus } from '../services/login'
 import getFeed from '../services/getFeed'
 
 export default {
@@ -7,15 +7,13 @@ export default {
 		return {
 			errormsg: null,
 			loading: true,
-			userID: null,
-			postList: [],
+			postList: []
 		}
 	},
 	methods: {
 		async refresh() {
 			this.postList = [];
-			this.userID = getLoginCookie();
-			if (this.userID == null)
+			if (authStatus.status == null)
 				this.$router.push("/login");
 			else {
 				this.loading = true;

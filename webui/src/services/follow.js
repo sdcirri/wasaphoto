@@ -7,12 +7,11 @@ import {
     BlockedException,
     UserNotFoundException
 } from './apiErrors'
-import getLoginCookie from './getLoginCookie'
+import { authStatus } from './login'
 
 export default async function follow(toFollow) {
-    const uid = getLoginCookie();
-    if (uid == null) throw BadAuthException;
-    let resp = await api.post(`/users/${uid}/follow/${toFollow}`, {},
+    if (authStatus.status == null) throw BadAuthException;
+    let resp = await api.post(`/users/${authStatus.status}/follow/${toFollow}`, {},
         { "headers": { "Authorization": `bearer ${uid}` } }
     );
     switch (resp.status) {

@@ -1,6 +1,6 @@
 <script>
 import b64AsBlob from '../services/b64AsBlob'
-import getLoginCookie from '../services/getLoginCookie'
+import { authStatus } from '../services/login'
 import getProfile from '../services/getProfile'
 import ProfileControls from '../components/ProfileControls.vue'
 
@@ -14,7 +14,6 @@ export default {
 		return {
 			errormsg: null,
 			loading: true,
-			auth: null,
 			profile: null,
 			following: null,
 			blocked: null,
@@ -25,9 +24,8 @@ export default {
 		async refresh() {
 			this.loading = true;
 			this.errormsg = "";
-			this.auth = getLoginCookie();
 			this.profile = await getProfile(this.userID);
-			this.ownProfile = (this.auth == this.profile.userID);
+			this.ownProfile = (authStatus.status == this.profile.userID);
 			const blob = b64AsBlob(this.profile.proPicB64);
 			this.blobUrl = URL.createObjectURL(blob);
 			this.loading = false;

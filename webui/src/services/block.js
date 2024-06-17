@@ -1,13 +1,12 @@
 import api from './axios'
 
 import { BadFollowOperation, BadAuthException, InternalServerError, BlockedException, UserNotFoundException } from './apiErrors'
-import getLoginCookie from './getLoginCookie'
+import { authStatus } from './login'
 
 export default async function block(toBlock) {
-    const uid = getLoginCookie();
-    if (uid == null) throw BadAuthException;
-    let resp = await api.post(`/users/${uid}/block/${toBlock}`, {},
-        { "headers": { "Authorization": `bearer ${uid}` } }
+    if (authStatus.status == null) throw BadAuthException;
+    let resp = await api.post(`/users/${authStatus.status}/block/${toBlock}`, {},
+        { "headers": { "Authorization": `bearer ${authStatus.status}` } }
     );
     switch (resp.status) {
         case 201:

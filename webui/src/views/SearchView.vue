@@ -1,15 +1,14 @@
 <script>
 import { ref } from 'vue'
 
-import searchUser from '../services/searchUser';
-import getLoginCookie from '../services/getLoginCookie';
+import searchUser from '../services/searchUser'
 
 export default {
 	data: function () {
 		return {
 			errormsg: null,
 			query: ref(),
-			results: [],
+			results: []
 		}
 	},
 	methods: {
@@ -46,7 +45,7 @@ export default {
 		</div>
 
 		<div
-			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			class="proCardList align-items-center pt-3 pb-2 mb-3">
 			<ProCard v-for="profile in results" :key="profile.userID" :userID="profile.userID" @profileError="onProfileError" />
 		</div>
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>

@@ -1,11 +1,10 @@
 import api from './axios'
 import { BadAuthException, BadFeedException } from './apiErrors';
-import getLoginCookie from './getLoginCookie'
+import { authStatus } from './login'
 
 export default async function getFeed() {
-    const uid = getLoginCookie();
-    if (uid == null) throw BadAuthException;
-    let resp = await api.get(`/feed/${uid}`, { headers: { "authorization": `bearer ${uid}`} });
+    if (authStatus.status == null) throw BadAuthException;
+    let resp = await api.get(`/feed/${authStatus.status}`, { headers: { "authorization": `bearer ${authStatus.status}`} });
     switch (resp.status) {
         case 200:
             return resp.data;

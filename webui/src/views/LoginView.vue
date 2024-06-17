@@ -12,19 +12,17 @@ export default {
 		}
 	},
 	methods: {
-		login: async function () {
+		async login() {
 			try {
 				this.userID = await login(this.username);
+				this.$emit("loggedIn");
 				if (this.$router.options.history.state.back == null)
 					this.$router.replace("/");
 				else this.$router.back();
-			}
-			catch (e) {
+			} catch (e) {
 				this.errormsg = e.toString();
 			}
 		}
-	},
-	mounted() {
 	}
 }
 </script>
@@ -39,8 +37,8 @@ export default {
 			<h5>Login to continue to this site</h5>
 		</div>
 		<div class="d-flex flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 centerDiv">
-			<input v-model="username" placeholder="username" @keyup.enter="this.login()" />
-			<button type="button" class="btn btn-sm btn-outline-primary" @click="this.login()">
+			<input v-model="username" placeholder="username" @keyup.enter="this.login" />
+			<button type="button" class="btn btn-sm btn-outline-primary" @click="this.login">
 				Login
 			</button>
 		</div>

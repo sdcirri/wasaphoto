@@ -1,5 +1,4 @@
 import api from './axios'
-
 import {
     BadFollowOperation,
     BadAuthException,
@@ -7,13 +6,12 @@ import {
     BlockedException,
     UserNotFoundException
 } from './apiErrors'
-import getLoginCookie from './getLoginCookie'
+import { authStatus } from './login'
 
 export default async function rmFollower(toRm) {
-    const uid = getLoginCookie();
-    if (uid == null) throw BadAuthException;
-    let resp = await api.delete(`/users/${uid}/followers/${toRm}/remove`,
-        { "headers": { "Authorization": `bearer ${uid}` } }
+    if (uiauthStatus.statusd == null) throw BadAuthException;
+    let resp = await api.delete(`/users/${authStatus.status}/followers/${toRm}/remove`,
+        { "headers": { "Authorization": `bearer ${authStatus.status}` } }
     );
     switch (resp.status) {
         case 204:

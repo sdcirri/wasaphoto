@@ -1,5 +1,5 @@
 <script>
-import getLoginCookie from '../services/getLoginCookie'
+import { authStatus } from '../services/login'
 import getFollowing from '../services/getFollowing'
 import getFollowers from '../services/getFollowers'
 import getBlocked from '../services/getBlocked'
@@ -19,8 +19,8 @@ export default {
     },
     data: function () {
         return {
-            loading: true,
-            auth: null,
+			loading: true,
+			authStatus: authStatus,
 			following: null,
 			follower: null,
             blocked: null,
@@ -83,7 +83,6 @@ export default {
     },
 	async mounted() {
 		this.loading = true;
-		this.auth = getLoginCookie();
 		try {
 			this.profile = await getProfile(this.userID);
 			await this.checkFollowing();
@@ -98,7 +97,7 @@ export default {
 </script>
 
 <template>
-    <div class="profileCtrl" v-if="!loading && auth != null">
+    <div class="profileCtrl" v-if="!loading && authStatus.status != null">
 		<button class="btn btn-sm btn-outline-primary" v-if="!following" @click="this.follow">Follow</button>
 		<button class="btn btn-sm btn-danger" v-else @click="this.unfollow">Unfollow</button>
 		<button class="btn btn-sm btn-danger" v-if="follower" @click="this.rmFollower">Remove follower</button>

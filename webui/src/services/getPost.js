@@ -1,6 +1,6 @@
 import api from './axios'
 
-import getLoginCookie from './getLoginCookie'
+import { authStatus } from './login'
 import {
     BadIdsException,
     BlockedException,
@@ -10,9 +10,8 @@ import {
 } from './apiErrors'
 
 export default async function getPost(pid) {
-    const uid = getLoginCookie();
-    if (uid == null) throw BadAuthException;
-    let resp = await api.get(`/posts/${pid}`, { "headers": { "Authorization": `bearer ${uid}` } });
+    if (authStatus.status == null) throw BadAuthException;
+    let resp = await api.get(`/posts/${pid}`, { "headers": { "Authorization": `bearer ${authStatus.status}` } });
     switch (resp.status) {
         case 200:
             return resp.data;

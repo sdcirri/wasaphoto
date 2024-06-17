@@ -1,6 +1,5 @@
 <script>
 import getPost from '../services/getPost'
-import getLoginCookie from '../services/getLoginCookie'
 import isLiked from '../services/isLiked'
 import likePost from '../services/likePost'
 import unlikePost from '../services/unlikePost'
@@ -15,7 +14,6 @@ export default {
     data: function () {
         return {
             post: null,
-            auth: null,
             likeIndicator: "🩶",
             likeCount: 0,
             loading: true
@@ -42,7 +40,6 @@ export default {
         async refresh() {
             this.loading = true;
             this.post = await getPost(this.ppostID);
-            this.auth = getLoginCookie();
             this.likeCount = this.post.likeCount;
             this.indicatorsRefresh();
             this.loading = false;

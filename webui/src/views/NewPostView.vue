@@ -1,7 +1,6 @@
 <script>
 import { ref } from 'vue'
 
-import getLoginCookie from '../services/getLoginCookie'
 import newPost from '../services/newPost'
 
 export default {
@@ -10,8 +9,7 @@ export default {
 			errormsg: null,
 			uploadB64: null,
 			caption: ref(""),
-			imgLoading: false,
-			userID: null
+			imgLoading: false
 		}
 	},
 	methods: {
@@ -39,9 +37,6 @@ export default {
 			await newPost(b64split[1], this.caption);
 			this.$router.replace("/");
 		}
-	},
-	mounted() {
-		this.userID = getLoginCookie();
 	}
 }
 </script>

@@ -1,6 +1,6 @@
 import api from './axios'
 
-import getLoginCookie from './getLoginCookie'
+import { authStatus } from './login'
 import {
     BadIdsException,
     BlockedException,
@@ -9,8 +9,7 @@ import {
 } from './apiErrors'
 
 export default async function getProfile(uid) {
-    const auth = getLoginCookie();
-    const headers = (auth != null) ? { "Authorization": `bearer ${uid}` } : {};
+    const headers = (authStatus.status != null) ? { "Authorization": `bearer ${authStatus.status}` } : {};
     let resp = await api.get(`/users/${uid}`, { "headers": headers });
     switch (resp.status) {
         case 200:

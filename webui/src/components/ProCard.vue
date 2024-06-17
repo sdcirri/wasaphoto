@@ -1,5 +1,5 @@
 <script>
-import getLoginCookie from '../services/getLoginCookie'
+import { authStatus } from '../services/login'
 import ProfileControls from './ProfileControls.vue'
 import getProfile from '../services/getProfile'
 
@@ -15,8 +15,7 @@ export default {
             loading: true,
             profile: null,
             following: null,
-            ownProfile: null,
-            auth: null
+            ownProfile: null
         }
     },
     methods: {
@@ -27,7 +26,6 @@ export default {
             try {
                 this.loading = true;
                 this.profile = await getProfile(this.userID);
-                this.auth = getLoginCookie();
                 this.loading = false;
             } catch (e) {
                 this.emitError(e);
@@ -36,7 +34,7 @@ export default {
     },
     async mounted() {
         await this.refresh();
-        this.ownProfile = (this.profile.userID == this.auth);
+        this.ownProfile = (this.profile.userID == authStatus.status);
     }
 }
 </script>
