@@ -20,9 +20,17 @@ export default {
 			catch (e) {
 				this.errormsg = e.toString();
 			}
+			this.refresh();
+		},
+		onProfileError(e) {
+			this.errormsg = e.toString();
+		},
+		refresh() {
+			this.errormsg = null;
 		}
 	},
 	mounted() {
+		this.refresh();
 	}
 }
 </script>
@@ -39,7 +47,7 @@ export default {
 
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<ProCard v-for="profile in results" :key="profile.userID" :profile="profile" />
+			<ProCard v-for="profile in results" :key="profile.userID" :userID="profile.userID" @profileError="onProfileError" />
 		</div>
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 	</div>

@@ -36,7 +36,7 @@ export default {}
 							<li class="nav-item">
 								<RouterLink to="/newpost" class="nav-link">
 									<svg class="feather">
-										<use href="/feather-sprite-v4.29.0.svg#layout" />
+										<use href="/feather-sprite-v4.29.0.svg#plus" />
 									</svg>
 									New post
 								</RouterLink>
@@ -44,7 +44,7 @@ export default {}
 							<li class="nav-item">
 								<RouterLink :to="`/profile/${getLoginCookie()}`" class="nav-link">
 									<svg class="feather">
-										<use href="/feather-sprite-v4.29.0.svg#key" />
+										<use href="/feather-sprite-v4.29.0.svg#user" />
 									</svg>
 									My profile
 								</RouterLink>
@@ -52,7 +52,7 @@ export default {}
 							<li class="nav-item">
 								<RouterLink to="/search" class="nav-link">
 									<svg class="feather">
-										<use href="/feather-sprite-v4.29.0.svg#key" />
+										<use href="/feather-sprite-v4.29.0.svg#search" />
 									</svg>
 									Search
 								</RouterLink>

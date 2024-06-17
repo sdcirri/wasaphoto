@@ -1,13 +1,8 @@
 <script>
 import b64AsBlob from '../services/b64AsBlob'
-import getBlocked from '../services/getBlocked'
-import getFollowing from '../services/getFollowing'
 import getLoginCookie from '../services/getLoginCookie'
 import getProfile from '../services/getProfile'
-import follow from '../services/follow'
-import unfollow from '../services/unfollow'
-import block from '../services/block'
-import unblock from '../services/unblock'
+import ProfileControls from '../components/ProfileControls.vue'
 
 export default {
 	computed: {
@@ -27,54 +22,6 @@ export default {
 		}
 	},
 	methods: {
-		async checkFollowing() {
-			try {
-				const followingList = await getFollowing();
-				this.following = followingList.some(id => id == this.profile.userID);
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-		},
-		async checkBlocked() {
-			try {
-				const blockedList = await getBlocked();
-				this.blocked = blockedList.some(id => id == this.profile.userID);
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-		},
-		async follow() {
-			try {
-				await follow(this.profile.userID);
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-            this.refresh();		// to update follower count
-		},
-		async unfollow() {
-            try {
-				await unfollow(this.profile.userID);
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-            this.refresh();		// to update follower count
-		},
-		async block() {
-            try {
-				await block(this.profile.userID);
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-            await this.checkBlocked();
-		},
-		async unblock() {
-            try {
-				await unblock(this.profile.userID);
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-            await this.checkBlocked();
-		},
 		async refresh() {
 			this.loading = true;
 			this.errormsg = "";
@@ -83,8 +30,6 @@ export default {
 			this.ownProfile = (this.auth == this.profile.userID);
 			const blob = b64AsBlob(this.profile.proPicB64);
 			this.blobUrl = URL.createObjectURL(blob);
-			this.following = this.checkFollowing();
-			this.blocked = this.checkBlocked();
 			this.loading = false;
 		}
 	},
@@ -109,18 +54,13 @@ export default {
 						<h6>{{ this.profile.followers }} followers</h6>
 						<h6>{{ this.profile.following }} following</h6>
 					</div>
-					<div v-if="ownProfile">
+					<div v-else>
 						<h6><RouterLink to="/">{{ this.profile.followers }} followers</RouterLink></h6>
 						<h6><RouterLink to="/">{{ this.profile.following }} following</RouterLink></h6>
 					</div>
 				</h4>
 			</div>
-			<div class="profileCtrl" v-if="!ownProfile">
-				<button class="btn btn-sm btn-outline-primary" v-if="!loading && auth != null && !following" @click="this.follow">Follow</button>
-				<button class="btn btn-sm btn-danger" v-if="!loading && auth != null && following" @click="this.unfollow">Unfollow</button>
-				<button class="btn btn-sm btn-danger" v-if="!loading && auth != null && !blocked" @click="this.block">Block</button>
-				<button class="btn btn-sm btn-outline-primary" v-if="!loading && auth != null && blocked" @click="this.unblock">Unblock</button>
-			</div>
+			<ProfileControls v-if="!ownProfile" :userID="this.profile.userID" @controlRefresh="refresh" />
 			<div class="streamContainer">
 				<PostCard v-for="post in this.profile.posts" v-bind:key="post.postID" :ppostID="post" />
 			</div>
@@ -152,9 +92,5 @@ export default {
 	display: flex;
 	flex-direction: column;
 	margin: auto 32px auto 32px;
-}
-
-.profileCtrl > * {
-	margin: 0 16px 0 16px;
 }
 </style>

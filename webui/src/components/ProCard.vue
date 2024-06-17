@@ -1,60 +1,54 @@
 <script>
-
-import follow from '../services/follow'
-import getFollowing from '../services/getFollowing'
 import getLoginCookie from '../services/getLoginCookie'
-import b64AsBlob from '../services/b64AsBlob'
+import ProfileControls from './ProfileControls.vue'
+import getProfile from '../services/getProfile'
 
 export default {
     props: {
-        profile: {
-            type: Object,
+        userID: {
+            type: Number,
             required: true
         }
     },
     data: function () {
         return {
-            blobUrl: null,
-            uid: null,
-            username: null,
-            proPicB64: null,
+            loading: true,
+            profile: null,
             following: null,
+            ownProfile: null,
             auth: null
         }
     },
     methods: {
-        async follow() {
-            await follow(this.uid);
-            await this.checkFollowing();
+        emitError(e) {
+            this.$emit("profileError", e);
         },
-        async checkFollowing() {
-            const followingList = await getFollowing();
-            this.following = followingList.some(id => id == this.uid);
+        async refresh() {
+            try {
+                this.loading = true;
+                this.profile = await getProfile(this.userID);
+                this.auth = getLoginCookie();
+                this.loading = false;
+            } catch (e) {
+                this.emitError(e);
+            }
         }
     },
     async mounted() {
-        // Deep copy props for operations
-        this.uid = new Number(this.profile.userID);
-        this.username = this.profile.username;
-        this.proPicB64 = this.profile.proPicB64;
-        this.auth = getLoginCookie();
-        await this.checkFollowing();
-        const blob = b64AsBlob(this.proPicB64);
-        this.blobUrl = URL.createObjectURL(blob);
-    },
-    beforeUnmount() {
-        URL.revokeObjectURL(this.blobUrl);
+        await this.refresh();
+        this.ownProfile = (this.profile.userID == this.auth);
     }
 }
 </script>
 
 <template>
-    <div v-if="uid != auth" class="proBox" id="container">
-        <img class="propic" :src="blobUrl" :alt="`${username}'s profile picture`" />
-        <RouterLink :to="`/profile/${ uid }`" class="spaced">{{ username }}</RouterLink>
-        <button id="followButton" class="btn btn-sm btn-outline-primary" v-if="auth != null && !following" @click="this.follow">Follow</button>
+    <div class="proBox" id="container" v-if="!loading">
+        <img class="propic" :src="`data:image/jpg;base64,${this.profile.proPicB64}`" :alt="`${this.profile.username}'s profile picture`" />
+        <RouterLink :to="`/profile/${ this.profile.userID }`" class="spaced"><h3>{{ this.profile.username }}</h3></RouterLink>
+        <ProfileControls v-if="!ownProfile" :userID="this.profile.userID" @controlRefresh="refresh" @profileError="emitError" />
         <br />
     </div>
+    <LoadingSpinner v-else />
 </template>
 
 <style>

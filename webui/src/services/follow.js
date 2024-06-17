@@ -1,6 +1,12 @@
 import api from './axios'
 
-import { BadFollowOperation, BadAuthException, InternalServerError, BlockedException, UserNotFoundException } from './apiErrors'
+import {
+    BadFollowOperation,
+    BadAuthException,
+    InternalServerError,
+    BlockedException,
+    UserNotFoundException
+} from './apiErrors'
 import getLoginCookie from './getLoginCookie'
 
 export default async function follow(toFollow) {

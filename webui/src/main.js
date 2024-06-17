@@ -9,12 +9,14 @@ import LoadingSpinner from './components/LoadingSpinner.vue'
 
 import './assets/dashboard.css'
 import './assets/main.css'
+import ProfileControls from './components/ProfileControls.vue'
 
 const app = createApp(App);
 app.config.globalProperties.$axios = axios;
 app.component("ErrorMsg", ErrorMsg);
 app.component("ProCard", ProCard);
 app.component("PostCard", PostCard);
+app.component("ProfileControls", ProfileControls);
 app.component("LoadingSpinner", LoadingSpinner);
 app.use(router);
 app.mount('#app');

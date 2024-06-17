@@ -10,7 +10,7 @@ export default async function unblock(toUnblock) {
         { "headers": { "Authorization": `bearer ${uid}` } }
     );
     switch (resp.status) {
-        case 201:
+        case 204:
             return;
         case 400:
             throw BadFollowOperation;

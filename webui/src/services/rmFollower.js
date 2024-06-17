@@ -9,10 +9,10 @@ import {
 } from './apiErrors'
 import getLoginCookie from './getLoginCookie'
 
-export default async function unfollow(toUnfollow) {
+export default async function rmFollower(toRm) {
     const uid = getLoginCookie();
     if (uid == null) throw BadAuthException;
-    let resp = await api.delete(`/users/${uid}/unfollow/${toUnfollow}`,
+    let resp = await api.delete(`/users/${uid}/followers/${toRm}/remove`,
         { "headers": { "Authorization": `bearer ${uid}` } }
     );
     switch (resp.status) {

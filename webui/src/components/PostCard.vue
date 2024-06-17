@@ -1,8 +1,6 @@
 <script>
-
 import getPost from '../services/getPost'
 import getLoginCookie from '../services/getLoginCookie'
-import getProfile from '../services/getProfile'
 import isLiked from '../services/isLiked'
 import likePost from '../services/likePost'
 import unlikePost from '../services/unlikePost'
@@ -18,7 +16,6 @@ export default {
         return {
             post: null,
             auth: null,
-            authorProfile: null,
             likeIndicator: "🩶",
             likeCount: 0,
             loading: true
@@ -45,7 +42,6 @@ export default {
         async refresh() {
             this.loading = true;
             this.post = await getPost(this.ppostID);
-            this.authorProfile = await getProfile(this.post.author);
             this.auth = getLoginCookie();
             this.likeCount = this.post.likeCount;
             this.indicatorsRefresh();
@@ -66,7 +62,7 @@ export default {
     <div>
         <LoadingSpinner v-if="loading" />
         <div v-if="!loading" class="postContainer">
-            <ProCard :profile="authorProfile"/>
+            <ProCard :userID="this.post.author"/>
             <p class="date">on {{ post.pubTime }}</p>
             <img class="postImg" :src=" 'data:image/jpg;base64,' + post.imageB64" /> <br />
             <p class="caption">{{ post.caption }}</p> <br />
@@ -79,7 +75,7 @@ export default {
 
 <style>
   .postImg {
-    height: 50vh;
+    height: 60vh;
   }
   .postCtrl button {
     display: contents;

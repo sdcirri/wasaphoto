@@ -6,8 +6,7 @@ import getLoginCookie from './getLoginCookie';
 export default async function getFollowers() {
     const uid = getLoginCookie();
     if (uid == null) throw BadAuthException;
-    let resp = await api.get(`/users/${uid}/followers`, {},
-        { "headers": { "Authorization": `bearer ${uid}` } }
+    let resp = await api.get(`/users/${uid}/followers`, { "headers": { "Authorization": `bearer ${uid}` } }
     );
     switch (resp.status) {
         case 200:
