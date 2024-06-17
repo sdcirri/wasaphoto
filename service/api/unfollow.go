@@ -26,7 +26,7 @@ func (rt *_router) unfollow(w http.ResponseWriter, r *http.Request, ps httproute
 		http.Error(w, "Bad userID", http.StatusBadRequest)
 		return
 	}
-	toUnfollow, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
+	toUnfollow, err := strconv.ParseInt(ps.ByName("toUnfollowID"), 10, 64)
 	if err != nil {
 		http.Error(w, "Bad userID", http.StatusBadRequest)
 		return

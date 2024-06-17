@@ -2,6 +2,7 @@
 import { RouterLink, RouterView } from 'vue-router'
 
 import logout from './services/logout';
+import getLoginCookie from './services/getLoginCookie';
 
 </script>
 <script>
@@ -41,7 +42,7 @@ export default {}
 								</RouterLink>
 							</li>
 							<li class="nav-item">
-								<RouterLink to="/" class="nav-link">
+								<RouterLink :to="`/profile/${getLoginCookie()}`" class="nav-link">
 									<svg class="feather">
 										<use href="/feather-sprite-v4.29.0.svg#key" />
 									</svg>

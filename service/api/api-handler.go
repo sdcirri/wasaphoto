@@ -17,6 +17,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/users/:userID/unblock/:toUnblockID", rt.unblock)
 	rt.router.GET("/users/:userID/followers", rt.getFollowers)
 	rt.router.GET("/users/:userID/following", rt.getFollowing)
+	rt.router.GET("/users/:userID/blocked", rt.getBlocked)
 	rt.router.DELETE("/users/:userID/followers/:toRemoveID/remove", rt.rmFollower)
 	rt.router.POST("/users/:userID/newpost", rt.newPost)
 	rt.router.GET("/posts/:postID", rt.getPost)

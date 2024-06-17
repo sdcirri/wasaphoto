@@ -15,7 +15,7 @@ func (db *appdbimpl) Unfollow(follower int64, toUnfollow int64) error {
 	if !follows {
 		return ErrNotFollowing
 	}
-	del, err := db.c.Prepare("delete from Follows where follower = ?, and following = ?")
+	del, err := db.c.Prepare("delete from Follows where follower = ? and following = ?")
 	if err != nil {
 		return err
 	}

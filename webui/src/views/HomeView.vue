@@ -46,10 +46,4 @@ export default {
 	</div>
 </template>
 
-<style>
-.streamContainer {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-</style>
+<style></style>

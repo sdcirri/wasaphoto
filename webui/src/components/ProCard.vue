@@ -1,8 +1,9 @@
 <script>
 
-import follow from '../services/follow';
-import getFollowing from '../services/getFollowing';
-import getLoginCookie from '../services/getLoginCookie';
+import follow from '../services/follow'
+import getFollowing from '../services/getFollowing'
+import getLoginCookie from '../services/getLoginCookie'
+import b64AsBlob from '../services/b64AsBlob'
 
 export default {
     props: {
@@ -22,14 +23,6 @@ export default {
         }
     },
     methods: {
-        proPic() {
-            const bin = window.atob(this.proPicB64);
-            const arrayBuffer = new ArrayBuffer(bin.length);
-            const bytes = new Uint8Array(arrayBuffer);
-            for (let i = 0; i < bin.length; i++)
-                bytes[i] = bin.charCodeAt(i);
-            return new Blob([arrayBuffer], { type: "image/jpg" });
-        },
         async follow() {
             await follow(this.uid);
             await this.checkFollowing();
@@ -46,7 +39,7 @@ export default {
         this.proPicB64 = this.profile.proPicB64;
         this.auth = getLoginCookie();
         await this.checkFollowing();
-        const blob = this.proPic();
+        const blob = b64AsBlob(this.proPicB64);
         this.blobUrl = URL.createObjectURL(blob);
     },
     beforeUnmount() {
@@ -58,7 +51,7 @@ export default {
 <template>
     <div v-if="uid != auth" class="proBox" id="container">
         <img class="propic" :src="blobUrl" :alt="`${username}'s profile picture`" />
-        <p class="spaced">{{ username }}</p>
+        <RouterLink :to="`/profile/${ uid }`" class="spaced">{{ username }}</RouterLink>
         <button id="followButton" class="btn btn-sm btn-outline-primary" v-if="auth != null && !following" @click="this.follow">Follow</button>
         <br />
     </div>
@@ -81,5 +74,6 @@ export default {
     margin-right: 2vh;
     margin-left: 2vh;
     font-size: 2vh;
+    font-style: bold;
 }
 </style>
