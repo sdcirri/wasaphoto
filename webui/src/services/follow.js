@@ -12,7 +12,7 @@ import { authStatus } from './login'
 export default async function follow(toFollow) {
     if (authStatus.status == null) throw BadAuthException;
     let resp = await api.post(`/users/${authStatus.status}/follow/${toFollow}`, {},
-        { "headers": { "Authorization": `bearer ${uid}` } }
+        { "headers": { "Authorization": `bearer ${authStatus.status}` } }
     );
     switch (resp.status) {
         case 201:

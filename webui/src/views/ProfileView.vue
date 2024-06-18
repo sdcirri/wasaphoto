@@ -12,6 +12,7 @@ export default {
   	},
 	data: function () {
 		return {
+			authStatus: authStatus,
 			errormsg: null,
 			loading: true,
 			profile: null,
@@ -53,8 +54,9 @@ export default {
 						<h6>{{ this.profile.following }} following</h6>
 					</div>
 					<div v-else>
-						<h6><RouterLink to="/">{{ this.profile.followers }} followers</RouterLink></h6>
-						<h6><RouterLink to="/">{{ this.profile.following }} following</RouterLink></h6>
+						<h6><RouterLink :to="`/profile/${authStatus.status}/followers`">{{ this.profile.followers }} followers</RouterLink></h6>
+						<h6><RouterLink :to="`/profile/${authStatus.status}/following`">{{ this.profile.following }} following</RouterLink></h6>
+						<h6><RouterLink :to="`/profile/${authStatus.status}/blocked`">Manage blocked users</RouterLink></h6>
 					</div>
 				</h4>
 			</div>

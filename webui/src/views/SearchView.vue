@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 
 import searchUser from '../services/searchUser'
+import { BlockedException } from '../services/apiErrors'
 
 export default {
 	data: function () {
@@ -16,13 +17,16 @@ export default {
 			try {
 				this.results = await searchUser(this.query);
 			}
-			catch (e) {
+			catch (BlockedException) {
 				this.errormsg = e.toString();
 			}
 			this.refresh();
 		},
 		onProfileError(e) {
-			this.errormsg = e.toString();
+			if (e.error === BlockedException.toString()) {
+				let i = this.results.indexOf(e.userID);
+				if (i !== -1) this.results.splice(i, 1);
+			}
 		},
 		refresh() {
 			this.errormsg = null;
@@ -46,7 +50,7 @@ export default {
 
 		<div
 			class="proCardList align-items-center pt-3 pb-2 mb-3">
-			<ProCard v-for="profile in results" :key="profile.userID" :userID="profile.userID" @profileError="onProfileError" />
+			<ProCard v-for="uid in results" :key="uid" :userID="uid" @profileError="onProfileError" />
 		</div>
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 	</div>

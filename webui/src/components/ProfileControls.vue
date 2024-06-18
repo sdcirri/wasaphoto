@@ -51,6 +51,7 @@ export default {
 		async unfollow() {
 			try {
 				await unfollow(this.profile.userID);
+				this.$emit("unfollowed", this.profile.userID);
 				this.$emit("controlRefresh");
 			} catch (e) {
 				this.$emit("profileError", e);
@@ -59,6 +60,7 @@ export default {
 		async rmFollower() {
 			try {
 				await rmFollower(this.profile.userID);
+				this.$emit("followerRm", this.profile.userID);
 				this.$emit("controlRefresh");
 			} catch (e) {
 				this.$emit("profileError", e);
@@ -75,6 +77,7 @@ export default {
 		async unblock() {
 			try {
 				await unblock(this.profile.userID);
+				this.$emit("unblock", this.profile.userID);
 				this.$emit("controlRefresh");
 			} catch (e) {
 				this.$emit("profileError", e);

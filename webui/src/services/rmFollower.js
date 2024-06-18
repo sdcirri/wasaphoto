@@ -9,7 +9,7 @@ import {
 import { authStatus } from './login'
 
 export default async function rmFollower(toRm) {
-    if (uiauthStatus.statusd == null) throw BadAuthException;
+    if (authStatus.status == null) throw BadAuthException;
     let resp = await api.delete(`/users/${authStatus.status}/followers/${toRm}/remove`,
         { "headers": { "Authorization": `bearer ${authStatus.status}` } }
     );

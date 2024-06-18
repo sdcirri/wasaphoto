@@ -20,7 +20,16 @@ export default {
     },
     methods: {
         emitError(e) {
-            this.$emit("profileError", e);
+            this.$emit("profileError", { "error": e, "userID": this.userID });
+        },
+        propagateFRM(uid) {
+            this.$emit("followerRm", uid);
+        },
+        propagateUnfollowed(uid) {
+            this.$emit("unfollowed", uid);
+        },
+        propagateUnblock(uid) {
+            this.$emit("unblock", uid);
         },
         async refresh() {
             try {
@@ -34,7 +43,8 @@ export default {
     },
     async mounted() {
         await this.refresh();
-        this.ownProfile = (this.profile.userID == authStatus.status);
+        if (this.profile != null)
+            this.ownProfile = (this.profile.userID == authStatus.status);
     }
 }
 </script>
@@ -43,7 +53,9 @@ export default {
     <div class="proBox" id="container" v-if="!loading">
         <img class="propic" :src="`data:image/jpg;base64,${this.profile.proPicB64}`" :alt="`${this.profile.username}'s profile picture`" />
         <RouterLink :to="`/profile/${ this.profile.userID }`" class="spaced"><h3>{{ this.profile.username }}</h3></RouterLink>
-        <ProfileControls v-if="!ownProfile" :userID="this.profile.userID" @controlRefresh="refresh" @profileError="emitError" />
+        <ProfileControls v-if="!ownProfile" :userID="this.profile.userID"
+            @controlRefresh="refresh" @profileError="emitError" @followerRm="propagateFRM"
+            @unfollowed="propagateUnfollowed" @unblock="propagateUnblock" />
         <br />
     </div>
     <LoadingSpinner v-else />

@@ -1,14 +1,9 @@
+import { InternalServerError } from './apiErrors'
 import api from './axios'
-
-import getProfile from './getProfile';
 
 export default async function searchUser(query) {
     if (query == "") return;
-    let results = [];
     let resp = await api.get(`/searchUser?q=${query}`, {});
-    for (let i = 0; i < resp.data.length; i++) {
-        let p = await getProfile(resp.data[i]);
-        results.push(p);
-    }
-    return results;
+    if (resp.status == 200) return resp.data;
+    throw InternalServerError;
 }
