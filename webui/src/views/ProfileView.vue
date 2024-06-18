@@ -5,11 +5,6 @@ import getProfile from '../services/getProfile'
 import ProfileControls from '../components/ProfileControls.vue'
 
 export default {
-	computed: {
-		userID() {
-			return this.$route.params.id;
-		}
-  	},
 	data: function () {
 		return {
 			authStatus: authStatus,
@@ -25,7 +20,7 @@ export default {
 		async refresh() {
 			this.loading = true;
 			this.errormsg = "";
-			this.profile = await getProfile(this.userID);
+			this.profile = await getProfile(authStatus.status);
 			this.ownProfile = (authStatus.status == this.profile.userID);
 			const blob = b64AsBlob(this.profile.proPicB64);
 			this.blobUrl = URL.createObjectURL(blob);
@@ -57,6 +52,7 @@ export default {
 						<h6><RouterLink :to="`/profile/${authStatus.status}/followers`">{{ this.profile.followers }} followers</RouterLink></h6>
 						<h6><RouterLink :to="`/profile/${authStatus.status}/following`">{{ this.profile.following }} following</RouterLink></h6>
 						<h6><RouterLink :to="`/profile/${authStatus.status}/blocked`">Manage blocked users</RouterLink></h6>
+						<h6><RouterLink :to="`/profile/${authStatus.status}/edit`">Edit profile</RouterLink></h6>
 					</div>
 				</h4>
 			</div>

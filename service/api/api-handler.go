@@ -8,7 +8,7 @@ import (
 func (rt *_router) Handler() http.Handler {
 	// Register routes
 	rt.router.POST("/session", rt.login)
-	rt.router.POST("/setUsername", rt.setUsername)
+	rt.router.PUT("/setUsername/:userID", rt.setUsername)
 	rt.router.PUT("/setPP/:userID", rt.setProPic)
 	rt.router.GET("/users/:userID", rt.getProfile)
 	rt.router.POST("/users/:userID/follow/:toFollowID", rt.follow)

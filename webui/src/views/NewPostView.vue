@@ -31,7 +31,7 @@ export default {
 		async publish() {
 			const b64split = this.uploadB64.split("base64,");
 			if (!(new RegExp("^(data\:image\/)(jpeg|png)")).exec(b64split[0])) {
-				this.errormsg = "Error: invalid image type!";
+				this.errormsg = "invalid image type!";
 				return
 			}
 			await newPost(b64split[1], this.caption);

@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"image"
 	"image/jpeg"
+	"log"
 	"os"
 	"strconv"
 )
@@ -31,9 +32,11 @@ func (db *appdbimpl) SetProPic(userID int64, imgB64 string) error {
 		return err
 	}
 	defer dst.Close()
+	log.Println("Created file", dstPath)
 
 	jpegOptions := &jpeg.Options{Quality: 85}
 	err = jpeg.Encode(dst, img, jpegOptions)
+	log.Println("Encoded image")
 	if err != nil {
 		return err
 	}
@@ -42,5 +45,6 @@ func (db *appdbimpl) SetProPic(userID int64, imgB64 string) error {
 		return err
 	}
 	_, err = tran.Exec(dstPath, userID)
+	log.Println("Profile picture updated")
 	return err
 }

@@ -61,7 +61,7 @@ export default {
         <div v-if="!loading" class="postContainer">
             <ProCard :userID="this.post.author"/>
             <p class="date">on {{ post.pubTime }}</p>
-            <img class="postImg" :src=" 'data:image/jpg;base64,' + post.imageB64" /> <br />
+            <img class="postImg" :src="'data:image/jpg;base64,' + post.imageB64" /> <br />
             <p class="caption">{{ post.caption }}</p> <br />
             <div class="postCtrl">
                 <button @click="toggleLike()">{{ likeIndicator }} {{ likeCount }}</button> <button @click="goToComments()">💬 {{ post.comments.length }}</button>

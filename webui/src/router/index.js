@@ -7,6 +7,7 @@ import ProfileView from '../views/ProfileView.vue'
 import FollowersView from '../views/FollowersView.vue'
 import FollowingView from '../views/FollowingView.vue'
 import BlockedView from '../views/BlockedView.vue'
+import EditProfileView from '../views/EditProfileView.vue'
 
 const router = createRouter({
 	history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -19,6 +20,7 @@ const router = createRouter({
 		{ path: '/profile/:id/followers', component: FollowersView },
 		{ path: '/profile/:id/following', component: FollowingView },
 		{ path: '/profile/:id/blocked', component: BlockedView },
+		{ path: '/profile/:id/edit', component: EditProfileView }
 	]
 })
 
