@@ -5,6 +5,7 @@ import { UsernameAlreadyTakenException } from '../services/apiErrors'
 import { authStatus } from '../services/login'
 import setUsername from '../services/setUsername'
 import getProfile from '../services/getProfile'
+import setPP from '../services/setPP'
 
 export default {
     data: function () {
@@ -46,7 +47,7 @@ export default {
                 const b64split = this.uploadB64.split("base64,");
                 if (!(new RegExp("^(data\:image\/)(jpeg|png)")).exec(b64split[0])) {
                     this.errormsg = "invalid image type!";
-                    return
+                    return;
                 }
                 try {
                     await setPP(b64split[1]);
@@ -68,22 +69,22 @@ export default {
             }
         },
         onUpload() {
-			const file = document.getElementById("upForm").files[0];
-			const reader = new FileReader();
+            const file = document.getElementById("upForm").files[0];
+            const reader = new FileReader();
 
-			reader.addEventListener(
-				"load", () => { this.uploadB64 = reader.result; },
-				false
-			);
+            reader.addEventListener(
+                "load", () => { this.uploadB64 = reader.result; },
+                false
+            );
 
             if (file) {
                 reader.readAsDataURL(file);
                 this.uploadNotOG = true;
             }
-		},
-		deleteImg() {
-			this.uploadB64 = this.profile.proPicB64;
-			this.errormsg = null;
+        },
+        deleteImg() {
+            this.uploadB64 = this.profile.proPicB64;
+            this.errormsg = null;
         },
         async submitAll() {
             await this.setUsername();
@@ -112,7 +113,7 @@ export default {
                     <button type="button" class="btn btn-danger" v-if="uploadNotOG" @click="deleteImg">Delete</button>
                 </span>
                 <input v-model="usernamebuf" @keyup.enter="setUsername" placeholder="pick a new username" />
-                <button type="button" class="btn btn-sm btn-outline-primary" @click="submitAll">Submit</button> <br/>
+                <button type="button" class="btn btn-sm btn-outline-primary" @click="submitAll">Submit</button> <br />
             </div>
         </div>
         <LoadingSpinner v-else />
@@ -125,17 +126,20 @@ export default {
     width: 50vh;
     height: 50vh;
 }
+
 .editContainer {
     display: flex;
     flex-direction: row;
 }
+
 .editPanel {
     display: flex;
     flex-direction: column;
     justify-content: center;
     height: 100%;
 }
-.editPanel > * {
+
+.editPanel>* {
     margin: 1vh;
 }
 </style>

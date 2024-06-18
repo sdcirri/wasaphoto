@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"encoding/base64"
 	"image"
+	"image/gif"
 	"image/jpeg"
-	"log"
+	"image/png"
 	"os"
 	"strconv"
 )
@@ -18,6 +19,12 @@ func (db *appdbimpl) SetProPic(userID int64, imgB64 string) error {
 	if !exists {
 		return ErrUserNotFound
 	}
+
+	image.RegisterFormat("jpg", "jpeg", jpeg.Decode, jpeg.DecodeConfig)
+	image.RegisterFormat("jpeg", "jpeg", jpeg.Decode, jpeg.DecodeConfig)
+	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
+	image.RegisterFormat("gif", "gif", gif.Decode, gif.DecodeConfig)
+
 	rawImg, err := base64.StdEncoding.DecodeString(imgB64)
 	if err != nil {
 		return err
@@ -32,11 +39,9 @@ func (db *appdbimpl) SetProPic(userID int64, imgB64 string) error {
 		return err
 	}
 	defer dst.Close()
-	log.Println("Created file", dstPath)
 
 	jpegOptions := &jpeg.Options{Quality: 85}
 	err = jpeg.Encode(dst, img, jpegOptions)
-	log.Println("Encoded image")
 	if err != nil {
 		return err
 	}
@@ -45,6 +50,5 @@ func (db *appdbimpl) SetProPic(userID int64, imgB64 string) error {
 		return err
 	}
 	_, err = tran.Exec(dstPath, userID)
-	log.Println("Profile picture updated")
 	return err
 }
