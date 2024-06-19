@@ -39,7 +39,8 @@ export default {
 			<LoadingSpinner v-if="loading" />
 			<div v-else>
 				<p v-if="this.postList.length == 0">So empty! Add some new friends to view their photos!</p>
-				<PostCard v-for="postID in this.postList" v-bind:key="postID" :ppostID="postID" />
+				<PostCard v-for="postID in this.postList" v-bind:key="postID" :ppostID="postID"
+					@postDeleted="refresh" />
 			</div>
 		</div>
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>

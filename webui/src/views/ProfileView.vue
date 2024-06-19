@@ -2,9 +2,14 @@
 import b64AsBlob from '../services/b64AsBlob'
 import { authStatus } from '../services/login'
 import getProfile from '../services/getProfile'
-import ProfileControls from '../components/ProfileControls.vue'
+import { reactive } from 'vue';
 
 export default {
+	computed: {
+		userID() {
+			return this.$route.params.id;
+		}
+	},
 	data: function () {
 		return {
 			authStatus: authStatus,
@@ -20,7 +25,7 @@ export default {
 		async refresh() {
 			this.loading = true;
 			this.errormsg = "";
-			this.profile = await getProfile(authStatus.status);
+			this.profile = await getProfile(this.userID);
 			this.ownProfile = (authStatus.status == this.profile.userID);
 			const blob = b64AsBlob(this.profile.proPicB64);
 			this.blobUrl = URL.createObjectURL(blob);
@@ -32,6 +37,11 @@ export default {
 	},
 	beforeUnmount() {
 		URL.revokeObjectURL(this.blobUrl);
+	},
+	watch: {
+		"$route.params.id": function (newUID) {
+			this.refresh();
+		}
 	}
 }
 </script>
@@ -49,16 +59,27 @@ export default {
 						<h6>{{ this.profile.following }} following</h6>
 					</div>
 					<div v-else>
-						<h6><RouterLink :to="`/profile/${authStatus.status}/followers`">{{ this.profile.followers }} followers</RouterLink></h6>
-						<h6><RouterLink :to="`/profile/${authStatus.status}/following`">{{ this.profile.following }} following</RouterLink></h6>
-						<h6><RouterLink :to="`/profile/${authStatus.status}/blocked`">Manage blocked users</RouterLink></h6>
-						<h6><RouterLink :to="`/profile/${authStatus.status}/edit`">Edit profile</RouterLink></h6>
+						<h6>
+							<RouterLink :to="`/profile/${authStatus.status}/followers`">{{ this.profile.followers }}
+								followers</RouterLink>
+						</h6>
+						<h6>
+							<RouterLink :to="`/profile/${authStatus.status}/following`">{{ this.profile.following }}
+								following</RouterLink>
+						</h6>
+						<h6>
+							<RouterLink :to="`/profile/${authStatus.status}/blocked`">Manage blocked users</RouterLink>
+						</h6>
+						<h6>
+							<RouterLink :to="`/profile/${authStatus.status}/edit`">Edit profile</RouterLink>
+						</h6>
 					</div>
 				</h4>
 			</div>
 			<ProfileControls v-if="!ownProfile" :userID="this.profile.userID" @controlRefresh="refresh" />
 			<div class="streamContainer">
-				<PostCard v-for="post in this.profile.posts" v-bind:key="post.postID" :ppostID="post" />
+				<PostCard v-for="post in this.profile.posts" v-bind:key="post.postID" :showControls="!ownProfile"
+					:ppostID="post" @postDeleted="refresh" />
 			</div>
 		</div>
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>

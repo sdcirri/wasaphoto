@@ -1,12 +1,15 @@
 <script>
 import { authStatus } from '../services/login'
-import ProfileControls from './ProfileControls.vue'
 import getProfile from '../services/getProfile'
 
 export default {
     props: {
         userID: {
             type: Number,
+            required: true
+        },
+        showControls: {
+            type: Boolean,
             required: true
         }
     },
@@ -51,11 +54,14 @@ export default {
 
 <template>
     <div class="proBox" id="container" v-if="!loading">
-        <img class="propic" :src="`data:image/jpg;base64,${this.profile.proPicB64}`" :alt="`${this.profile.username}'s profile picture`" />
-        <RouterLink :to="`/profile/${ this.profile.userID }`" class="spaced"><h3>{{ this.profile.username }}</h3></RouterLink>
-        <ProfileControls v-if="!ownProfile" :userID="this.profile.userID"
-            @controlRefresh="refresh" @profileError="emitError" @followerRm="propagateFRM"
-            @unfollowed="propagateUnfollowed" @unblock="propagateUnblock" />
+        <img class="propic" :src="`data:image/jpg;base64,${this.profile.proPicB64}`"
+            :alt="`${this.profile.username}'s profile picture`" />
+        <RouterLink :to="`/profile/${this.profile.userID}`" class="spaced">
+            <h3>{{ this.profile.username }}</h3>
+        </RouterLink>
+        <ProfileControls v-if="!ownProfile && showControls" :userID="this.profile.userID" @controlRefresh="refresh"
+            @profileError="emitError" @followerRm="propagateFRM" @unfollowed="propagateUnfollowed"
+            @unblock="propagateUnblock" />
         <br />
     </div>
     <LoadingSpinner v-else />

@@ -11,24 +11,24 @@ import block from '../services/block'
 import unblock from '../services/unblock'
 
 export default {
-    props: {
-        userID: {
-            type: Number,
-            required: true
-        }
-    },
-    data: function () {
-        return {
+	props: {
+		userID: {
+			type: Number,
+			required: true
+		}
+	},
+	data: function () {
+		return {
 			loading: true,
 			authStatus: authStatus,
 			following: null,
 			follower: null,
-            blocked: null,
-            profile: null
-        }
-    },
-    methods: {
-        async checkFollowing() {
+			blocked: null,
+			profile: null
+		}
+	},
+	methods: {
+		async checkFollowing() {
 			const followingList = await getFollowing();
 			this.following = followingList.some(id => id == this.profile.userID);
 		},
@@ -39,7 +39,7 @@ export default {
 		async checkBlocked() {
 			const blockedList = await getBlocked();
 			this.blocked = blockedList.some(id => id == this.profile.userID);
-        },
+		},
 		async follow() {
 			try {
 				await follow(this.profile.userID);
@@ -83,7 +83,7 @@ export default {
 				this.$emit("profileError", e);
 			}
 		}
-    },
+	},
 	async mounted() {
 		this.loading = true;
 		try {
@@ -100,7 +100,7 @@ export default {
 </script>
 
 <template>
-    <div class="profileCtrl" v-if="!loading && authStatus.status != null">
+	<div class="profileCtrl" v-if="!loading && authStatus.status != null">
 		<button class="btn btn-sm btn-outline-primary" v-if="!following" @click="this.follow">Follow</button>
 		<button class="btn btn-sm btn-danger" v-else @click="this.unfollow">Unfollow</button>
 		<button class="btn btn-sm btn-danger" v-if="follower" @click="this.rmFollower">Remove follower</button>
@@ -110,7 +110,7 @@ export default {
 </template>
 
 <style>
-.profileCtrl > * {
-	margin: 0 2vh 0 2vh;
+.profileCtrl>* {
+	margin: 0 .5vh 0 .5vh;
 }
 </style>

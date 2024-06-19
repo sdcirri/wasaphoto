@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   webapi:
@@ -8,7 +8,12 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - './demo/db:/srv/wasaphoto'
+      - "./demo/db:/srv/wasaphoto"
     environment:
       CFG_CONFIG_PATH: /etc/wasaphoto/config.yml
-
+  webui:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "8080:80"

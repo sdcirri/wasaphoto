@@ -14,21 +14,40 @@ func (db *appdbimpl) DeleteComment(user int64, commentID int64) error {
 		return ErrUserNotFound
 	}
 
-	var oc int64
+	var oc, op int64
 	err = db.c.QueryRow("select author from Comments where commentID = ?", commentID).Scan(&oc)
 	if errors.Is(err, sql.ErrNoRows) {
 		return ErrCommentNotFound
 	} else if err != nil {
 		return err
 	}
-	if oc != user {
-		return ErrUserIsNotAuthor
-	}
-
-	del, err := db.c.Prepare("delete from Comments where commentID = ?")
+	err = db.c.QueryRow("select p.author from Posts p, Comments c where c.post = p.postID and c.commentID = ?", commentID).Scan(&op)
 	if err != nil {
 		return err
 	}
-	_, err = del.Exec(user, commentID)
-	return err
+	if user != oc && user != op { // OP should be able to delete comments on its own post
+		return ErrUserIsNotAuthor
+	}
+	deltran, err := db.c.Begin()
+	if err != nil {
+		return err
+	}
+	_, err = deltran.Exec("delete from Comments where commentID = ?", commentID)
+	if err != nil {
+		err2 := deltran.Rollback()
+		if err2 != nil {
+			return err2
+		}
+		return err
+	}
+	_, err = deltran.Exec("delete from LikesC where comment = ?", commentID)
+	if err != nil {
+		err2 := deltran.Rollback()
+		if err2 != nil {
+			return err2
+		}
+		return err
+	}
+
+	return deltran.Commit()
 }

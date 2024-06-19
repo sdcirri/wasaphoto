@@ -47,7 +47,8 @@ export default {
 		</div>
 		<div class="proCardList">
 			<LoadingSpinner v-if="loading" />
-			<ProCard v-else v-for="uid in userList" key="uid" :userID="uid" @profileError="onProfileError" @unfollowed="removeFollowing" />
+			<ProCard v-else v-for="uid in userList" v-bind:key="uid" :userID="uid" :showControls="true"
+				@profileError="onProfileError" @unfollowed="removeFollowing" />
 		</div>
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 	</div>

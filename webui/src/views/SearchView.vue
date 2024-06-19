@@ -48,9 +48,9 @@ export default {
 			<input v-model="query" placeholder="type here to search" @input="search()" />
 		</div>
 
-		<div
-			class="proCardList align-items-center pt-3 pb-2 mb-3">
-			<ProCard v-for="uid in results" :key="uid" :userID="uid" @profileError="onProfileError" />
+		<div class="proCardList align-items-center pt-3 pb-2 mb-3">
+			<ProCard v-for="uid in results" v-bind:key="uid" :userID="uid" :showControls="true"
+				@profileError="onProfileError" />
 		</div>
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 	</div>

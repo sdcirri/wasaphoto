@@ -3,6 +3,7 @@ export const InternalServerError = new Error("internal server error");
 export const BadIdsException = new Error("bad auth token or bad userID");
 export const BlockedException = new Error("forbidden: user blocked you!");
 export const UserNotFoundException = new Error("user not found");
+export const PostNotFoundException = new Error("post not found");
 export const BadAuthException = new Error("bad auth token");
 export const BadFollowOperation = new Error("bad follow operation");
 export const AccessDeniedException = new Error("access denied");

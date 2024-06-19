@@ -45,7 +45,7 @@ func (db *appdbimpl) GetAccount(id int64, userID int64) (Account, error) {
 	}
 
 	a.Posts = make([]int64, 0)
-	q, err := db.c.Query("select postID from Posts where author = ?", userID)
+	q, err := db.c.Query("select postID from Posts where author = ? order by pub_time desc", userID)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return a, err
 	}
