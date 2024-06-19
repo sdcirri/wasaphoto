@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -26,7 +27,12 @@ func (rt *_router) setUsername(w http.ResponseWriter, r *http.Request, ps httpro
 		http.Error(w, "Bad userID", http.StatusBadRequest)
 		return
 	}
-	username := r.URL.Query().Get("username")
+	usernameraw, err := io.ReadAll(r.Body)
+	if err != nil {
+		rt.internalServerError(err, w)
+		return
+	}
+	username := string(usernameraw[:])
 	if username == "" {
 		http.Error(w, "Bad request: no username provided", http.StatusBadRequest)
 		return

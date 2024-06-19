@@ -5,7 +5,7 @@ import { authStatus } from './login'
 
 export default async function setUsername(username) {
     if (authStatus.status == null) throw BadAuthException;
-    let resp = await api.put(`/setUsername/${authStatus.status}?username=${username}`, {},
+    let resp = await api.put(`/setUsername/${authStatus.status}`, username,
         { "headers": { "Authorization": `bearer ${authStatus.status}` } });
     switch (resp.status) {
         case 200:
