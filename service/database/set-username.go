@@ -12,7 +12,8 @@ func (db *appdbimpl) SetUsername(userID int64, username string) error {
 		return err
 	}
 	_, err = up.Exec(username, userID)
-	if sqliteErr, ok := err.(sqlite3.Error); ok && errors.Is(sqliteErr.Code, sqlite3.ErrConstraint) {
+	var sqliteErr sqlite3.Error
+	if errors.As(err, &sqliteErr) && sqliteErr.Code == sqlite3.ErrConstraint {
 		return ErrUsernameAlreadyTaken
 	}
 	return nil

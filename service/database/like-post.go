@@ -39,7 +39,8 @@ func (db *appdbimpl) LikePost(user int64, postID int64) error {
 	}
 	_, err = ins.Exec(user, postID)
 	if err != nil {
-		if sqliteErr, ok := err.(sqlite3.Error); ok && errors.Is(sqliteErr.Code, sqlite3.ErrConstraint) {
+		var sqliteErr sqlite3.Error
+		if errors.As(err, &sqliteErr) && sqliteErr.Code == sqlite3.ErrConstraint {
 			return ErrAlreadyLiked
 		}
 		return err

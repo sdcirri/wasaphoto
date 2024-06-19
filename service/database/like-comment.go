@@ -36,7 +36,8 @@ func (db *appdbimpl) LikeComment(user int64, commentID int64) error {
 	}
 	_, err = ins.Exec(user, commentID)
 	if err != nil {
-		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.Code == sqlite3.ErrConstraint {
+		var sqliteErr sqlite3.Error
+		if errors.As(err, &sqliteErr) && sqliteErr.Code == sqlite3.ErrConstraint {
 			return ErrAlreadyLiked
 		}
 		return err
