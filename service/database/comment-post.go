@@ -31,7 +31,7 @@ func (db *appdbimpl) CommentPost(user int64, postID int64, comment string) (int6
 	if blocked {
 		return 0, ErrUserIsBlocked
 	}
-	ins, err := db.c.Prepare("insert into Comments values (?, ?, ?, ?)")
+	ins, err := db.c.Prepare("insert into Comments(time, author, post, text) values (?, ?, ?, ?)")
 	if err != nil {
 		return 0, err
 	}

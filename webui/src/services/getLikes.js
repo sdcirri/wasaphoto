@@ -1,11 +1,11 @@
 import api from './axios'
 
-import { BadAuthException, InternalServerError, AccessDeniedException } from './apiErrors'
+import { BadAuthException, InternalServerError, AccessDeniedException, PostNotFoundException } from './apiErrors'
 import { authStatus } from './login'
 
-export default async function getFollowers() {
+export default async function getLikes(postID) {
     if (authStatus.status == null) throw BadAuthException;
-    let resp = await api.get(`/users/${authStatus.status}/followers`,
+    let resp = await api.get(`/posts/${postID}/likes`,
         { "headers": { "Authorization": `bearer ${authStatus.status}` } }
     );
     switch (resp.status) {
@@ -16,6 +16,8 @@ export default async function getFollowers() {
             throw BadAuthException;
         case 403:
             throw AccessDeniedException;
+        case 404:
+            throw PostNotFoundException;
         default:
             throw InternalServerError;
     }

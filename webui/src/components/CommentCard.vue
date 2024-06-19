@@ -1,9 +1,5 @@
 <script>
 import { authStatus } from '../services/login'
-import getPost from '../services/getPost'
-import isLiked from '../services/isLiked'
-import likePost from '../services/likePost'
-import unlikePost from '../services/unlikePost'
 import rmPost from '../services/rmPost'
 
 export default {
@@ -23,38 +19,34 @@ export default {
     },
     methods: {
         async toggleLike() {
-            const liked = await isLiked(this.post.postID);
+            const liked = await isCommentLiked(this.comment.commentID);
             if (!liked) {
-                await likePost(this.post.postID);
+                await likeComment(this.comment.commentID);
                 this.likeCount++;
                 this.$refs.likeSvg.classList.add("heartFilled");
             } else {
-                await unlikePost(this.post.postID);
+                await unlikeComment(this.post.postID);
                 this.likeCount--;
                 this.$refs.likeSvg.classList.remove("heartFilled");
             }
             this.indicatorsRefresh();
         },
-        goToComments() {
-            // STUB! This function will push the comments view onto the router stack
-            this.indicatorsRefresh();
-        },
         async refresh() {
             this.loading = true;
-            this.post = await getPost(this.ppostID);
-            this.likeCount = this.post.likeCount;
-            this.ownPost = (this.post.author == authStatus.status);
+            this.comment = await getComment(this.commentID);
+            this.likeCount = this.comment.likes;
+            this.ownPost = (this.comment.author == authStatus.status);
             this.loading = false;
             this.indicatorsRefresh();
         },
         async indicatorsRefresh() {
-            const liked = await isLiked(this.post.postID);
+            const liked = await isCommentLiked(this.comment.commentID);
             if (liked) this.$refs.likeSvg.classList.add("heartFilled");
             else this.$refs.likeSvg.classList.remove("heartFilled");
         },
-        async rmPost() {
-            await rmPost(this.post.postID);
-            this.$emit("postDeleted");
+        async rmComment() {
+            await rmComment(this.comment.commentID);
+            this.$emit("commentDeleted");
         }
     },
     mounted() {
@@ -68,16 +60,15 @@ export default {
         <LoadingSpinner v-if="loading" />
         <div v-if="!loading" class="postContainer">
             <span class="flex d-flex align-items-center">
-                <ProCard :userID="this.post.author" :showControls="!ownPost" />
+                <ProCard :userID="comment.author" :showControls="!ownPost" />
                 <button class="delBtn" v-if="ownPost" @click="rmPost">
                     <svg class="feather featherBtn">
                         <use href="/feather-sprite-v4.29.0.svg#trash-2" />
                     </svg>
                 </button>
             </span>
-            <p class="date">on {{ post.pubTime }}</p>
-            <img class="postImg" :src="'data:image/jpg;base64,' + post.imageB64" /> <br />
-            <p class="caption">{{ post.caption }}</p> <br />
+            <p class="date">on {{ comment.time }}</p>
+            <p class="caption">{{ comment.content }}</p> <br />
             <div class="flex d-flex justify-center postCtrl">
                 <button @click="toggleLike()">
                     <div class="flex d-flex align-items-center">
@@ -87,19 +78,13 @@ export default {
                         {{ likeCount }}
                     </div>
                 </button>
-                <RouterLink v-if="ownPost" :to="`/posts/${post.postID}/likes`">
+                <!-- Could be nice but I'm undecided
+                <RouterLink v-if="ownPost" :to="`/comments/${comment.commentID}/likes`">
                     <svg class="feather featherBtn">
                         <use href="/feather-sprite-v4.29.0.svg#eye" />
                     </svg>
                 </RouterLink>
-                <button @click="goToComments()">
-                    <div class="flex d-flex align-items-center">
-                        <svg class="feather featherBtn">
-                            <use href="/feather-sprite-v4.29.0.svg#message-circle" />
-                        </svg>
-                        {{ post.comments.length }}
-                    </div>
-                </button>
+                -->
             </div>
         </div>
     </div>

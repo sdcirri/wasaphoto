@@ -514,7 +514,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserList'
         '400':
-          description: Bad cookie
+          description: Bad auth token
         '401':
           description: Unauthenticated
         '403':
