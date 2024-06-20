@@ -1,24 +1,24 @@
+import api from './axios'
 import {
-    AccessDeniedException,
     BadAuthException,
+    BadCommentException,
     InternalServerError,
     PostNotFoundException
 } from './apiErrors'
-import api from './axios'
-
 import { authStatus } from './login'
 
-export default async function rmPost(postID) {
+export default async function commentPost(pid, text) {
     if (authStatus.status == null) throw BadAuthException;
-    let resp = await api.delete(`/posts/${postID}/delete`,
-        { "headers": { "Authorization": `bearer ${authStatus.status}` } });
+    let resp = await api.post(`/posts/${pid}/comment/${authStatus.status}`,
+        text, { "headers": { "Authorization": `bearer ${authStatus.status}` } }
+    );
     switch (resp.status) {
-        case 204:
-            return;
+        case 201:
+            return resp.data;
+        case 400:
+            throw BadCommentException;
         case 401:
             throw BadAuthException;
-        case 403:
-            throw AccessDeniedException;
         case 404:
             throw PostNotFoundException;
         default:

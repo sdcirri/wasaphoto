@@ -2,9 +2,9 @@ import { BadAuthException, InternalServerError } from './apiErrors'
 import { authStatus } from './login'
 import api from './axios'
 
-export default async function isLiked(pid) {
+export default async function isCommentLiked(pid) {
     if (authStatus.status == null) throw BadAuthException;
-    let resp = await api.get(`/posts/${pid}/liked/${authStatus.status}`,
+    let resp = await api.get(`/comments/${pid}/liked/${authStatus.status}`,
         { "headers": { "Authorization": `bearer ${authStatus.status}` } });
     switch (resp.status) {
         case 200:

@@ -45,7 +45,7 @@ func (db *appdbimpl) GetPost(id int64, postid int64) (Post, error) {
 		p.Likes = append(p.Likes, like)
 	}
 
-	q, err = db.c.Query("select commentID from Comments where post = ?", postid)
+	q, err = db.c.Query("select commentID from Comments where post = ? order by time desc", postid)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return p, err
 	}

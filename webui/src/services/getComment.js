@@ -5,17 +5,20 @@ import {
     BadIdsException,
     BlockedException,
     UserNotFoundException,
-    InternalServerError
+    InternalServerError,
+    BadAuthException
 } from './apiErrors'
 
-export default async function getProfile(uid) {
-    const headers = (authStatus.status != null) ? { "Authorization": `bearer ${authStatus.status}` } : {};
-    let resp = await api.get(`/users/${uid}`, { "headers": headers });
+export default async function getComment(cid) {
+    if (authStatus.status == null) throw BadAuthException;
+    let resp = await api.get(`/comments/${cid}`, { "headers": { "Authorization": `bearer ${authStatus.status}` } });
     switch (resp.status) {
         case 200:
             return resp.data;
         case 400:
             throw BadIdsException;
+        case 401:
+            throw BadAuthException;
         case 403:
             throw BlockedException;
         case 404:

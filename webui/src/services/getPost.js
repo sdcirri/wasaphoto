@@ -15,7 +15,6 @@ export default async function getPost(pid) {
     switch (resp.status) {
         case 200:
             return resp.data;
-            break;
         case 400:
             throw BadIdsException;
         case 401:

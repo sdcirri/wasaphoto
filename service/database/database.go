@@ -110,6 +110,7 @@ type AppDatabase interface {
 	CommentExists(commentID int64) (bool, error)
 	GetComment(commentID int64) (Comment, error)
 	IsLiked(user int64, post int64) (bool, error)
+	IsCommentLiked(user int64, comment int64) (bool, error)
 	LikePost(user int64, postID int64) error
 	UnlikePost(user int64, postID int64) error
 	CommentPost(user int64, postID int64, comment string) (int64, error)

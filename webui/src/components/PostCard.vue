@@ -36,8 +36,7 @@ export default {
             this.indicatorsRefresh();
         },
         goToComments() {
-            // STUB! This function will push the comments view onto the router stack
-            this.indicatorsRefresh();
+            this.$router.push(`/posts/${this.post.postID}/comments`);
         },
         async refresh() {
             this.loading = true;

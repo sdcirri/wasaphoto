@@ -564,6 +564,7 @@ paths:
             $ref: '#/components/schemas/ID'
         - in: path
           name: postID
+          description: Post ID
           required: true
           schema:
             $ref: '#/components/schemas/ID'
@@ -679,7 +680,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ID'
         '400':
-          description: Bad cookie, bad post ID, empty comment or comment too long
+          description: Empty comment or comment too long
         '401':
           description: Unauthenticated
         '403':
@@ -782,6 +783,38 @@ paths:
           description: Unauthenticated
         '404':
           description: Comment not found or comment wasn't liked
+
+  /comments/{commentID}/liked/{userID}:
+    get:
+      tags:
+        - Feed tools
+      summary: Is comment liked?
+      description: Checks whether the comment has been liked by user
+      operationId: isCommentLiked
+      parameters:
+        - in: path
+          name: userID
+          description: Your ID
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+        - in: path
+          name: commentID
+          description: Comment ID
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+      responses:
+        '200':
+          description: Operation successful
+          content:
+            text/plain:
+              schema:
+                type: boolean
+        '401':
+          description: Unauthenticated or bad authentication
+        '404':
+          description: Post not found
 
   /comments/{commentID}/delete/{userID}:
     delete:

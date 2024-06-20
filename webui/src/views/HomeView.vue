@@ -12,13 +12,17 @@ export default {
 	},
 	methods: {
 		async refresh() {
+			this.errormsg = "";
 			this.postList = [];
 			if (authStatus.status == null)
 				this.$router.push("/login");
 			else {
 				this.loading = true;
-				this.errormsg = null;
-				this.postList = await getFeed();
+				try {
+					this.postList = await getFeed();
+				} catch (e) {
+					this.errormsg = e.toString();
+				}
 				this.loading = false;
 			}
 		},

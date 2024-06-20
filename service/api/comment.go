@@ -16,7 +16,7 @@ func (rt *_router) commentPost(w http.ResponseWriter, r *http.Request, ps httpro
 		http.Error(w, "Unauthenticated", http.StatusUnauthorized)
 		return
 	} else if errors.Is(err, database.ErrUserNotFound) {
-		http.Error(w, "Bad authentication token", http.StatusBadRequest)
+		http.Error(w, "Bad authentication token", http.StatusUnauthorized)
 		return
 	} else if err != nil {
 		rt.internalServerError(err, w)
@@ -24,7 +24,7 @@ func (rt *_router) commentPost(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 	userID, err := strconv.ParseInt(ps.ByName("userID"), 10, 64)
 	if err != nil {
-		http.Error(w, "Bad userID", http.StatusBadRequest)
+		http.Error(w, "Bad userID", http.StatusUnauthorized)
 		return
 	}
 	if token != userID {
@@ -33,7 +33,7 @@ func (rt *_router) commentPost(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 	postID, err := strconv.ParseInt(ps.ByName("postID"), 10, 64)
 	if err != nil {
-		http.Error(w, "Bad postID", http.StatusBadRequest)
+		http.Error(w, "Bad postID", http.StatusNotFound)
 		return
 	}
 	textRaw, err := io.ReadAll(r.Body)
@@ -61,6 +61,7 @@ func (rt *_router) commentPost(w http.ResponseWriter, r *http.Request, ps httpro
 	} else if err != nil {
 		rt.internalServerError(err, w)
 	} else {
+		w.WriteHeader(http.StatusCreated)
 		w.Header().Set("content-type", "text/plain")
 		_, err = w.Write([]byte(strconv.FormatInt(cID, 10)))
 		if err != nil {

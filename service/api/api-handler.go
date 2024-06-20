@@ -31,6 +31,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/comments/:commentID", rt.getComment)
 	rt.router.PUT("/comments/:commentID/like/:userID", rt.likeComment)
 	rt.router.DELETE("/comments/:commentID/unlike/:userID", rt.unlikeComment)
+	rt.router.GET("/comments/:commentID/liked/:userID", rt.isCommentLiked)
 	rt.router.DELETE("/comments/:commentID/delete/:userID", rt.deleteComment)
 	rt.router.GET("/searchUser", rt.SearchUser)
 

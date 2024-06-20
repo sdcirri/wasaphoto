@@ -1,18 +1,24 @@
 <script>
 import { authStatus } from '../services/login'
-import rmPost from '../services/rmPost'
+import isCommentLiked from '../services/isCommentLiked'
+import likeComment from '../services/likeComment'
+import unlikeComment from '../services/unlikeComment'
+import getComment from '../services/getComment'
+import rmComment from '../services/rmComment'
+import getPost from '../services/getPost'
 
 export default {
     props: {
-        ppostID: {
+        commentID: {
             type: Number,
             required: true
         }
     },
     data: function () {
         return {
-            post: null,
+            comment: null,
             ownPost: null,
+            ownComment: null,
             likeCount: 0,
             loading: true
         }
@@ -25,7 +31,7 @@ export default {
                 this.likeCount++;
                 this.$refs.likeSvg.classList.add("heartFilled");
             } else {
-                await unlikeComment(this.post.postID);
+                await unlikeComment(this.comment.commentID);
                 this.likeCount--;
                 this.$refs.likeSvg.classList.remove("heartFilled");
             }
@@ -34,8 +40,10 @@ export default {
         async refresh() {
             this.loading = true;
             this.comment = await getComment(this.commentID);
+            let post = await getPost(this.comment.postID);
             this.likeCount = this.comment.likes;
-            this.ownPost = (this.comment.author == authStatus.status);
+            this.ownPost = (post.author == authStatus.status);
+            this.ownComment = (this.comment.author == authStatus.status);
             this.loading = false;
             this.indicatorsRefresh();
         },
@@ -56,12 +64,12 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div class="cardRoot">
         <LoadingSpinner v-if="loading" />
-        <div v-if="!loading" class="postContainer">
+        <div v-else class="postContainer">
             <span class="flex d-flex align-items-center">
-                <ProCard :userID="comment.author" :showControls="!ownPost" />
-                <button class="delBtn" v-if="ownPost" @click="rmPost">
+                <ProCard :userID="comment.author" :showControls="!ownComment" />
+                <button class="delBtn" v-if="ownPost || ownComment" @click="rmComment">
                     <svg class="feather featherBtn">
                         <use href="/feather-sprite-v4.29.0.svg#trash-2" />
                     </svg>
@@ -78,7 +86,7 @@ export default {
                         {{ likeCount }}
                     </div>
                 </button>
-                <!-- Could be nice but I'm undecided
+                <!-- Would be nice but I'm undecided
                 <RouterLink v-if="ownPost" :to="`/comments/${comment.commentID}/likes`">
                     <svg class="feather featherBtn">
                         <use href="/feather-sprite-v4.29.0.svg#eye" />
@@ -91,10 +99,6 @@ export default {
 </template>
 
 <style>
-.postImg {
-    height: 70vh;
-}
-
 .postCtrl {
     gap: 3vh;
 }
@@ -113,10 +117,10 @@ export default {
 }
 
 .postContainer {
+    width: 42vw;
     margin: 16px;
     padding: 12px;
     border: 1px solid black;
-    inline-size: min-content;
 }
 
 .caption {
