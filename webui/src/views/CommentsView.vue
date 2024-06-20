@@ -44,6 +44,9 @@ export default {
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
+		},
+		componentError(e) {
+			this.errormsg = e.toString();
 		}
 	},
 	mounted() {
@@ -67,7 +70,7 @@ export default {
 				</div>
 				<p v-if="this.commentList.length == 0">So empty! Start the discussion!</p>
 				<CommentCard v-for="commentID in this.commentList" v-bind:key="commentID" :commentID="commentID"
-					@commentDeleted="refresh" />
+					@commentDeleted="refresh" @renderError="componentError" />
 			</div>
 		</div>
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
@@ -75,7 +78,7 @@ export default {
 </template>
 
 <style>
-.commentForm > * {
+.commentForm>* {
 	vertical-align: middle;
 	flex-direction: row;
 	margin: 2vh;

@@ -29,13 +29,18 @@ export default {
 			this.errormsg = null;
 		},
 		async publish() {
+			this.errormsg = "";
 			const b64split = this.uploadB64.split("base64,");
 			if (!(new RegExp("^(data\:image\/)(jpeg|png)")).exec(b64split[0])) {
 				this.errormsg = "invalid image type!";
 				return
 			}
-			await newPost(b64split[1], this.caption);
-			this.$router.replace("/");
+			try {
+				await newPost(b64split[1], this.caption);
+				this.$router.replace("/");
+			} catch (e) {
+				this.errormsg = e.toString();
+			}
 		}
 	}
 }

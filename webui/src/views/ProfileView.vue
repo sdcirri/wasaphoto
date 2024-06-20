@@ -25,11 +25,18 @@ export default {
 		async refresh() {
 			this.loading = true;
 			this.errormsg = "";
-			this.profile = await getProfile(this.userID);
-			this.ownProfile = (authStatus.status == this.profile.userID);
-			const blob = b64AsBlob(this.profile.proPicB64);
-			this.blobUrl = URL.createObjectURL(blob);
-			this.loading = false;
+			try {
+				this.profile = await getProfile(this.userID);
+				this.ownProfile = (authStatus.status == this.profile.userID);
+				const blob = b64AsBlob(this.profile.proPicB64);
+				this.blobUrl = URL.createObjectURL(blob);
+				this.loading = false;
+			} catch (e) {
+				this.errormsg = e;
+			}
+		},
+		componentError(e) {
+			this.errormsg = e.toString();
 		}
 	},
 	mounted() {
@@ -79,7 +86,7 @@ export default {
 			<ProfileControls v-if="!ownProfile" :userID="this.profile.userID" @controlRefresh="refresh" />
 			<div class="streamContainer">
 				<PostCard v-for="post in this.profile.posts" v-bind:key="post.postID" :showControls="!ownProfile"
-					:ppostID="post" @postDeleted="refresh" />
+					:ppostID="post" @postDeleted="refresh" @renderError="componentError" />
 			</div>
 		</div>
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>

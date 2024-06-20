@@ -24,11 +24,15 @@ export default {
         async refresh() {
             this.loading = true;
             this.errormsg = "";
-            this.profile = await getProfile(authStatus.status);
-            this.usernamebuf = ref(this.profile.username);
-            this.uploadB64 = "data:image/jpg;base64," + this.profile.proPicB64;
-            this.uploadNotOG = false;
-            this.loading = false;
+            try {
+                this.profile = await getProfile(authStatus.status);
+                this.usernamebuf = ref(this.profile.username);
+                this.uploadB64 = "data:image/jpg;base64," + this.profile.proPicB64;
+                this.uploadNotOG = false;
+                this.loading = false;
+            } catch (e) {
+                this.errormsg = e.toString();
+            }
         },
         async setUsername() {
             this.validateUsername();

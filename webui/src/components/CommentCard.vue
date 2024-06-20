@@ -25,37 +25,60 @@ export default {
     },
     methods: {
         async toggleLike() {
-            const liked = await isCommentLiked(this.comment.commentID);
-            if (!liked) {
-                await likeComment(this.comment.commentID);
-                this.likeCount++;
-                this.$refs.likeSvg.classList.add("heartFilled");
-            } else {
-                await unlikeComment(this.comment.commentID);
-                this.likeCount--;
-                this.$refs.likeSvg.classList.remove("heartFilled");
+            try {
+                const liked = await isCommentLiked(this.comment.commentID);
+                if (!liked) {
+                    await likeComment(this.comment.commentID);
+                    this.likeCount++;
+                    this.$refs.likeSvg.classList.add("heartFilled");
+                } else {
+                    await unlikeComment(this.comment.commentID);
+                    this.likeCount--;
+                    this.$refs.likeSvg.classList.remove("heartFilled");
+                }
+                this.indicatorsRefresh();
+            } catch (e) {
+                this.propagateToView(e);
             }
-            this.indicatorsRefresh();
         },
         async refresh() {
             this.loading = true;
-            this.comment = await getComment(this.commentID);
-            let post = await getPost(this.comment.postID);
-            this.likeCount = this.comment.likes;
-            this.ownPost = (post.author == authStatus.status);
-            this.ownComment = (this.comment.author == authStatus.status);
-            this.loading = false;
-            this.indicatorsRefresh();
+            try {
+                this.comment = await getComment(this.commentID);
+                let post = await getPost(this.comment.postID);
+                this.likeCount = this.comment.likes;
+                this.ownPost = (post.author == authStatus.status);
+                this.ownComment = (this.comment.author == authStatus.status);
+                this.loading = false;
+                this.indicatorsRefresh();
+            } catch (e) {
+                this.propagateToView(e);
+            }
         },
         async indicatorsRefresh() {
-            const liked = await isCommentLiked(this.comment.commentID);
-            if (liked) this.$refs.likeSvg.classList.add("heartFilled");
-            else this.$refs.likeSvg.classList.remove("heartFilled");
+            try {
+                const liked = await isCommentLiked(this.comment.commentID);
+                if (liked) this.$refs.likeSvg.classList.add("heartFilled");
+                else this.$refs.likeSvg.classList.remove("heartFilled");
+            } catch (e) {
+                this.propagateToView(e);
+            }
         },
         async rmComment() {
-            await rmComment(this.comment.commentID);
-            this.$emit("commentDeleted");
+            try {
+                await rmComment(this.comment.commentID);
+                this.$emit("commentDeleted");
+            } catch (e) {
+                this.propagateToView(e);
+            }
+        },
+        propagateProCardError(e) {
+            this.propagateToView(e.error);
+        },
+        propagateToView(e) {
+            this.$emit("renderError", e);
         }
+
     },
     mounted() {
         this.refresh();
@@ -68,7 +91,7 @@ export default {
         <LoadingSpinner v-if="loading" />
         <div v-else class="postContainer">
             <span class="flex d-flex align-items-center">
-                <ProCard :userID="comment.author" :showControls="!ownComment" />
+                <ProCard :userID="comment.author" :showControls="!ownComment" @profileError="propagateProCardError" />
                 <button class="delBtn" v-if="ownPost || ownComment" @click="rmComment">
                     <svg class="feather featherBtn">
                         <use href="/feather-sprite-v4.29.0.svg#trash-2" />

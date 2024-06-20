@@ -23,37 +23,59 @@ export default {
     },
     methods: {
         async toggleLike() {
-            const liked = await isLiked(this.post.postID);
-            if (!liked) {
-                await likePost(this.post.postID);
-                this.likeCount++;
-                this.$refs.likeSvg.classList.add("heartFilled");
-            } else {
-                await unlikePost(this.post.postID);
-                this.likeCount--;
-                this.$refs.likeSvg.classList.remove("heartFilled");
+            try {
+                const liked = await isLiked(this.post.postID);
+                if (!liked) {
+                    await likePost(this.post.postID);
+                    this.likeCount++;
+                    this.$refs.likeSvg.classList.add("heartFilled");
+                } else {
+                    await unlikePost(this.post.postID);
+                    this.likeCount--;
+                    this.$refs.likeSvg.classList.remove("heartFilled");
+                }
+                this.indicatorsRefresh();
+            } catch (e) {
+                this.propagateToView(e);
             }
-            this.indicatorsRefresh();
         },
         goToComments() {
             this.$router.push(`/posts/${this.post.postID}/comments`);
         },
         async refresh() {
             this.loading = true;
-            this.post = await getPost(this.ppostID);
-            this.likeCount = this.post.likeCount;
-            this.ownPost = (this.post.author == authStatus.status);
-            this.loading = false;
-            this.indicatorsRefresh();
+            try {
+                this.post = await getPost(this.ppostID);
+                this.likeCount = this.post.likeCount;
+                this.ownPost = (this.post.author == authStatus.status);
+                this.loading = false;
+                this.indicatorsRefresh();
+            } catch (e) {
+                this.propagateToView(e);
+            }
         },
         async indicatorsRefresh() {
-            const liked = await isLiked(this.post.postID);
-            if (liked) this.$refs.likeSvg.classList.add("heartFilled");
-            else this.$refs.likeSvg.classList.remove("heartFilled");
+            try {
+                const liked = await isLiked(this.post.postID);
+                if (liked) this.$refs.likeSvg.classList.add("heartFilled");
+                else this.$refs.likeSvg.classList.remove("heartFilled");
+            } catch (e) {
+                this.propagateToView(e);
+            }
         },
         async rmPost() {
-            await rmPost(this.post.postID);
-            this.$emit("postDeleted");
+            try {
+                await rmPost(this.post.postID);
+                this.$emit("postDeleted");
+            } catch (e) {
+                this.propagateToView(e);
+            }
+        },
+        propagateProCardError(e) {
+            this.propagateToView(e.error);
+        },
+        propagateToView(e) {
+            this.$emit("renderError", e);
         }
     },
     mounted() {
@@ -67,7 +89,7 @@ export default {
         <LoadingSpinner v-if="loading" />
         <div v-if="!loading" class="postContainer">
             <span class="flex d-flex align-items-center">
-                <ProCard :userID="this.post.author" :showControls="!ownPost" />
+                <ProCard :userID="this.post.author" :showControls="!ownPost" @profileError="propagateProCardError" />
                 <button class="delBtn" v-if="ownPost" @click="rmPost">
                     <svg class="feather featherBtn">
                         <use href="/feather-sprite-v4.29.0.svg#trash-2" />

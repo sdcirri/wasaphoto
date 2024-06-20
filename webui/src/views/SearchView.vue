@@ -17,7 +17,7 @@ export default {
 			try {
 				this.results = await searchUser(this.query);
 			}
-			catch (BlockedException) {
+			catch (e) {
 				this.errormsg = e.toString();
 			}
 			this.refresh();
