@@ -53,6 +53,10 @@ export default {
                     this.errormsg = "invalid image type!";
                     return;
                 }
+                if (b64split[1].length > 6990508) {
+                    this.errormsg = "image too big! Compress it or scale it down with an externl tool";
+                    return;
+			    }
                 try {
                     await setPP(b64split[1]);
                     this.refresh();

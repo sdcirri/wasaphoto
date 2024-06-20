@@ -36,6 +36,10 @@ func (rt *_router) setProPic(w http.ResponseWriter, r *http.Request, ps httprout
 		rt.internalServerError(err, w)
 		return
 	}
+	if len(body) > 6990508 {
+		http.Error(w, "bad request: image too big, images up to 5 MB are supported", http.StatusBadRequest)
+		return
+	}
 	err = rt.db.SetProPic(userID, string(body[:]))
 	if errors.Is(err, database.ErrUserNotFound) {
 		http.Error(w, "User not found", http.StatusNotFound)

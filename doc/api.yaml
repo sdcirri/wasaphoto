@@ -903,7 +903,7 @@ components:
     B64Image:
       type: string
       format: binary
-      maxLength: 3000000    # images up to about 2 MB are supported
+      maxLength: 6990508    # images up to 5 MB are supported
       description: An image encoded in base64
 
     LargeText:

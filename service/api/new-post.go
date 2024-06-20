@@ -43,8 +43,8 @@ func (rt *_router) newPost(w http.ResponseWriter, r *http.Request, ps httprouter
 		http.Error(w, "Bad request: malformed json: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-	if len(postParams.Image) > 3000000 {
-		http.Error(w, "bad request: image too big, images up to 2 MB are supported", http.StatusBadRequest)
+	if len(postParams.Image) > 6990508 {
+		http.Error(w, "bad request: image too big, images up to 5 MB are supported", http.StatusBadRequest)
 		return
 	}
 	if len(postParams.Caption) > 2048 {
