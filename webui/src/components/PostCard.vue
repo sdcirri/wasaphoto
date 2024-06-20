@@ -128,7 +128,8 @@ export default {
 
 <style>
 .postImg {
-    height: 70vh;
+    max-width: 40vw;
+    max-height: 70vh;
 }
 
 .postCtrl {
