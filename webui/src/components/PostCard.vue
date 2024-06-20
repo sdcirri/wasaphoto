@@ -97,7 +97,10 @@ export default {
                 </button>
             </span>
             <p class="date">on {{ post.pubTime }}</p>
-            <img class="postImg" :src="'data:image/jpg;base64,' + post.imageB64" /> <br />
+            <div class="imgContainer">
+                <img class="postImg" :src="'data:image/jpg;base64,' + post.imageB64" />
+            </div>
+            <br />
             <p class="caption">{{ post.caption }}</p> <br />
             <div class="flex d-flex justify-center postCtrl">
                 <button @click="toggleLike()">
@@ -156,7 +159,16 @@ export default {
     inline-size: min-content;
 }
 
+.imgContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 .caption {
+    font-size: 16pt;
     margin: 16px 0 0 0;
 }
 
