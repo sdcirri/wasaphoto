@@ -5,6 +5,7 @@ import isLiked from '../services/isLiked'
 import likePost from '../services/likePost'
 import unlikePost from '../services/unlikePost'
 import rmPost from '../services/rmPost'
+import timeAgo from '../services/timeAgo'
 
 export default {
     props: {
@@ -23,6 +24,7 @@ export default {
     },
     methods: {
         async toggleLike() {
+            if (loading) return;
             try {
                 const liked = await isLiked(this.post.postID);
                 if (!liked) {
@@ -48,6 +50,7 @@ export default {
                 this.post = await getPost(this.ppostID);
                 this.likeCount = this.post.likeCount;
                 this.ownPost = (this.post.author == authStatus.status);
+                this.post.pubTime = new Date(this.post.pubTime);
                 this.loading = false;
                 this.indicatorsRefresh();
             } catch (e) {
@@ -76,6 +79,9 @@ export default {
         },
         propagateToView(e) {
             this.$emit("renderError", e);
+        },
+        timeAgo() {
+            return timeAgo(this.post.pubTime);
         }
     },
     mounted() {
@@ -96,7 +102,7 @@ export default {
                     </svg>
                 </button>
             </span>
-            <p class="date">on {{ post.pubTime }}</p>
+            <p class="date">{{ timeAgo() }}</p>
             <div class="imgContainer">
                 <img class="postImg" :src="'data:image/jpg;base64,' + post.imageB64" />
             </div>
