@@ -24,7 +24,7 @@ export default {
     },
     methods: {
         async toggleLike() {
-            if (loading) return;
+            if (this.loading) return;
             try {
                 const liked = await isLiked(this.post.postID);
                 if (!liked) {
