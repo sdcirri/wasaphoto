@@ -6,6 +6,7 @@ import unlikeComment from '../services/unlikeComment'
 import getComment from '../services/getComment'
 import rmComment from '../services/rmComment'
 import getPost from '../services/getPost'
+import timeAgo from '../services/timeAgo'
 
 export default {
     props: {
@@ -46,6 +47,7 @@ export default {
             try {
                 this.comment = await getComment(this.commentID);
                 let post = await getPost(this.comment.postID);
+                this.comment.time = new Date(this.comment.time);
                 this.likeCount = this.comment.likes;
                 this.ownPost = (post.author == authStatus.status);
                 this.ownComment = (this.comment.author == authStatus.status);
@@ -77,6 +79,9 @@ export default {
         },
         propagateToView(e) {
             this.$emit("renderError", e);
+        },
+        timeAgo() {
+            return timeAgo(this.comment.time);
         }
 
     },
@@ -98,7 +103,7 @@ export default {
                     </svg>
                 </button>
             </span>
-            <p class="date">on {{ comment.time }}</p>
+            <p class="date">{{ timeAgo() }}</p>
             <p class="caption">{{ comment.content }}</p> <br />
             <div class="flex d-flex justify-center postCtrl">
                 <button @click="toggleLike()">
@@ -109,13 +114,6 @@ export default {
                         {{ likeCount }}
                     </div>
                 </button>
-                <!-- Would be nice but I'm undecided
-                <RouterLink v-if="ownPost" :to="`/comments/${comment.commentID}/likes`">
-                    <svg class="feather featherBtn">
-                        <use href="/feather-sprite-v4.29.0.svg#eye" />
-                    </svg>
-                </RouterLink>
-                -->
             </div>
         </div>
     </div>
