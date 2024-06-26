@@ -23,6 +23,8 @@ COPY --from=builder /src/demo/config_docker.yml /etc/wasaphoto/config.yml
 
 ### Mountpoint for database
 RUN mkdir /srv/wasaphoto
+### Default propic
+COPY --from=builder /src/demo/propic_default.jpg /srv/wasaphoto/propic_default.jpg
 
 ### Configuration
 ENV CFG_CONFIG_PATH /etc/wasaphoto/config.yml
