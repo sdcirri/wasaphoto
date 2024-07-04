@@ -110,6 +110,24 @@ func run() error {
 				_ = dst.Close()
 			}
 		}
+	} else {
+		// Temporary snippet for troubleshooting db mounting in Docker
+		logger.Info("docker debug: cfg.DB.InstallRoot is " + cfg.DB.InstallRoot)
+		_, err = os.Stat(cfg.DB.InstallRoot)
+		if os.IsNotExist(err) {
+			logger.Error("docker debug: installation root does not exist on filesystem!")
+			return err
+		}
+		logger.Info("docker debug: cfg.DB.Filename is " + cfg.DB.Filename)
+		_, err = os.Stat(cfg.DB.Filename)
+		if os.IsNotExist(err) {
+			logger.Info("docker debug: DB file does not exist, it SHOULD be automatically created later")
+		}
+		_, err = os.Stat(cfg.DB.InstallRoot + "/propic_default.jpg")
+		if os.IsNotExist(err) {
+			logger.Error("docker debug: propic_default.jpg does not exist on filesystem!")
+			return err
+		}
 	}
 
 	dbconn, err := sql.Open("sqlite3", cfg.DB.Filename)
