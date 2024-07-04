@@ -12,11 +12,14 @@ export default {
         return {
             loading: true,
             errormsg: null,
+            nameerrormsg: null,
             profile: null,
             usernamebuf: ref(),
-            usernamevalid: false,
             uploadB64: null,
             uploadNotOG: false,
+            usernameChanged: false,
+            usernameValid: true,
+            usernameTaken: false,
             authStatus: authStatus
         }
     },
@@ -36,15 +39,19 @@ export default {
         },
         async setUsername() {
             this.validateUsername();
-            if (this.usernamevalid)
+            if (this.usernameValid)
                 try {
                     await setUsername(this.usernamebuf);
+                    this.usernameChanged = true;
+                    this.usernameTaken = false;
                     this.refresh();
                 } catch (e) {
-                    this.errormsg = e.toString();
-                    if (e.toString() === UsernameAlreadyTakenException.toString)
-                        this.usernamevalid = false;
+                    if (e.toString() === UsernameAlreadyTakenException.toString()) {
+                        this.usernameTaken = true;
+                        this.usernameChanged = false;
+                    } else this.errormsg = e.toString();
                 }
+            else this.usernameChanged = false;
         },
         async setPP() {
             if (this.uploadNotOG) {
@@ -54,26 +61,25 @@ export default {
                     return;
                 }
                 if (b64split[1].length > 6990508) {
-                    this.errormsg = "image too big! Compress it or scale it down with an externl tool";
+                    this.errormsg = "image too big! Compress it or scale it down with an external tool";
                     return;
 			    }
                 try {
                     await setPP(b64split[1]);
-                    this.refresh();
                 } catch (e) {
                     this.errormsg = e.toString();
                 }
             }
         },
         validateUsername() {
-            this.usernamevalid = true;
-            if (this.usernamebuf < 3) {
-                this.errormsg = "username too short! At least 3 characters are required";
-                this.usernamevalid = false;
+            this.usernameValid = true;
+            if (this.usernamebuf.length < 3) {
+                this.nameerrormsg = "username too short! At least 3 characters are required";
+                this.usernameValid = false;
             }
-            if (this.usernamebuf > 40) {
-                this.errormsg = "username too long! Max 40 characters are allowed";
-                this.usernamevalid = false;
+            if (this.usernamebuf.length > 40) {
+                this.nameerrormsg = "username too long! Max 40 characters are allowed";
+                this.usernameValid = false;
             }
         },
         onUpload() {
@@ -97,7 +103,6 @@ export default {
         async submitAll() {
             await this.setUsername();
             await this.setPP();
-            this.refresh();
         }
     },
     mounted() {
@@ -121,6 +126,9 @@ export default {
                     <button type="button" class="btn btn-danger" v-if="uploadNotOG" @click="deleteImg">Delete</button>
                 </span>
                 <input v-model="usernamebuf" @keyup.enter="setUsername" placeholder="pick a new username" />
+                <div class="nameInfoBox" v-if="usernameChanged">Username changed successfully</div>
+                <div class="nameErrorBox" v-if="usernameTaken">Username already taken</div>
+                <div class="nameErrorBox" v-if="!usernameValid"> {{ nameerrormsg }} </div>
                 <button type="button" class="btn btn-sm btn-outline-primary" @click="submitAll">Submit</button> <br />
             </div>
         </div>
@@ -130,6 +138,24 @@ export default {
 </template>
 
 <style>
+.nameInfoBox {
+    color: black;
+    border: 2px solid blue;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    text-align: center;
+    background-color: rgba(127, 127, 255, 127);
+}
+
+.nameErrorBox {
+    color: black;
+    border: 2px solid red;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    text-align: center;
+    background-color: rgba(255, 127, 127, 127);
+}
+
 .propicPreview {
     width: 50vh;
     height: 50vh;
