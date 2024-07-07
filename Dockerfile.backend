@@ -22,11 +22,11 @@ RUN mkdir /etc/wasaphoto
 COPY --from=builder /src/demo/config_docker.yml /etc/wasaphoto/config.yml
 
 ### Mountpoint for database
-RUN mkdir /srv/wasaphoto
+RUN mkdir /app/db
 ### Default propic
-COPY --from=builder /src/demo/propic_default.jpg /srv/wasaphoto/propic_default.jpg
+COPY --from=builder /src/demo/propic_default.jpg /app/db/propic_default.jpg
 ### If that doesn't fix it, I give up!
-RUN chmod -R 777 /srv/wasaphoto
+#RUN chmod -R 777 /app/db
 
 ### Configuration
 ENV CFG_CONFIG_PATH /etc/wasaphoto/config.yml
