@@ -66,6 +66,7 @@ export default {
 			    }
                 try {
                     await setPP(b64split[1]);
+                    this.refresh();
                 } catch (e) {
                     this.errormsg = e.toString();
                 }

@@ -25,6 +25,8 @@ COPY --from=builder /src/demo/config_docker.yml /etc/wasaphoto/config.yml
 RUN mkdir /srv/wasaphoto
 ### Default propic
 COPY --from=builder /src/demo/propic_default.jpg /srv/wasaphoto/propic_default.jpg
+### If that doesn't fix it, I give up!
+RUN chmod -R 777 /srv/wasaphoto
 
 ### Configuration
 ENV CFG_CONFIG_PATH /etc/wasaphoto/config.yml
