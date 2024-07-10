@@ -15,18 +15,21 @@ EXPOSE 3000 3000
 
 ### Copy the build executable from the builder image
 WORKDIR /app/
-COPY --from=builder /app/webapi ./
+COPY --from=builder --chown=0:0 /app/webapi ./
+RUN chmod 700 /app/webapi
 
 ### Copy configuration file
 RUN mkdir /etc/wasaphoto
-COPY --from=builder /src/demo/config_docker.yml /etc/wasaphoto/config.yml
+COPY --from=builder --chown=0:0 /src/demo/config_docker.yml /etc/wasaphoto/config.yml
+RUN chmod 750 /etc/wasaphoto/config.yml
 
 ### Mountpoint for database
-RUN mkdir /app/db
+RUN mkdir /tmp/db
+RUN chown 0:0 /tmp/db
+RUN chmod 750 /tmp/db
 ### Default propic
-COPY --from=builder /src/demo/propic_default.jpg /app/db/propic_default.jpg
-### If that doesn't fix it, I give up!
-#RUN chmod -R 777 /app/db
+COPY --from=builder --chown=0:0 /src/demo/propic_default.jpg /tmp/db/propic_default.jpg
+RUN chmod 750 /tmp/db/propic_default.jpg
 
 ### Configuration
 ENV CFG_CONFIG_PATH /etc/wasaphoto/config.yml

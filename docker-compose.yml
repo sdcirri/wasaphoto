@@ -1,15 +1,15 @@
 services:
-  webapi:
+  backend:
     build:
       context: .
       dockerfile: Dockerfile.backend
     ports:
       - "3000:3000"
     volumes:
-      - "./demo/db:/srv/wasaphoto"
+      - "./demo/db:/tmp/db"
     environment:
       CFG_CONFIG_PATH: /etc/wasaphoto/config.yml
-  webui:
+  frontend:
     build:
       context: .
       dockerfile: Dockerfile.frontend

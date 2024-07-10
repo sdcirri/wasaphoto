@@ -33,7 +33,7 @@ func (db *appdbimpl) SetProPic(userID int64, imgB64 string) error {
 	if err != nil {
 		return ErrBadImage
 	}
-	dstPath := "/srv/wasaphoto/" + strconv.FormatInt(userID, 10) + "/propic.jpg"
+	dstPath := db.installRoot + "/" + strconv.FormatInt(userID, 10) + "/propic.jpg"
 	dst, err := os.Create(dstPath)
 	if err != nil {
 		return err
