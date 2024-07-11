@@ -33,7 +33,8 @@ export default {
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h1 class="h2">Login</h1>
 		</div>
-		<div class="d-flex flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 centerDiv">
+		<div class="d-flex flex-wrap flex-md-nowrap flex-column align-items-center pt-3 pb-2 mb-3 centerDiv">
+			<img class="wasa-big" src="../assets/wasaphoto.svg" />
 			<h5>Login to continue to this site</h5>
 		</div>
 		<div class="d-flex flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 centerDiv">
@@ -47,4 +48,8 @@ export default {
 	</div>
 </template>
 
-<style></style>
+<style>
+.wasa-big {
+	height: 20vh;
+}
+</style>

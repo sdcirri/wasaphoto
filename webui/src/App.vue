@@ -21,7 +21,7 @@ export default {
 <template>
 	<div>
 		<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-			<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#/">WASAPhoto</a>
+			<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 brand-font" href="#/">WASAPhoto</a>
 			<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
 				data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
 				aria-label="Toggle navigation">
@@ -51,7 +51,8 @@ export default {
 								</RouterLink>
 							</li>
 							<li class="nav-item">
-								<RouterLink :to="`/profile/${authStatus.status}`" class="nav-link" v-if="authStatus.status">
+								<RouterLink :to="`/profile/${authStatus.status}`" class="nav-link"
+									v-if="authStatus.status">
 									<svg class="feather">
 										<use href="/feather-sprite-v4.29.0.svg#user" />
 									</svg>
@@ -86,4 +87,10 @@ export default {
 	</div>
 </template>
 
-<style></style>
+<style>
+.brand-font {
+	text-align: center;
+	color: #1E88E5;
+	font-family: 'Dancing Script';
+}
+</style>
