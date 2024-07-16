@@ -2,6 +2,8 @@
 Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto! You can
 upload your photos directly from your PC, and they will be visible to everyone following you.
 
+This project was realized for the [Web And Software Architecture course](http://gamificationlab.uniroma1.it/en/wasa/) at Sapienza.
+
 # How to run
 ### Running in debug mode
 #### Backend
@@ -10,8 +12,8 @@ upload your photos directly from your PC, and they will be visible to everyone f
 ```
 #### Frontend
 ```shell
-    $ cd webui
-    $ npm run dev &
+    $ ./run-npm.sh
+    $ npm run dev
 ```
 ### Running in docker
 #### docker compose
@@ -20,12 +22,12 @@ upload your photos directly from your PC, and they will be visible to everyone f
 ```
 #### Backend only
 ```shell
-    $ docker build -t wasaphoto-webapi:latest -f Dockerfile.backend .
+    $ docker build -t wasaphoto-backend:latest -f Dockerfile.backend .
     $ docker run -t --rm -p 3000:3000 -v ./demo/db:/srv/wasaphoto wasaphoto-webapi:latest
 ```
 #### Frontend only
 ```shell
-    $ docker build -t wasaphoto-webui:latest -f Dockerfile.frontend .
+    $ docker build -t wasaphoto-frontend:latest -f Dockerfile.frontend .
     $ docker run -t --rm -p <PORT>:80 wasaphoto-webui:latest
 ```
 Your instance of WASAPhoto will be reachable through http://localhost:PORT/
