@@ -1,5 +1,6 @@
 ![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white) ![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white) ![Vue.js](https://img.shields.io/badge/vuejs-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D) ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 # WASAPhoto
+![wasa-screenshot](https://github.com/user-attachments/assets/f2860f88-6ccc-47b3-bc59-328d06eb585c)
 Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto! You can
 upload your photos directly from your PC, and they will be visible to everyone following you.
 
