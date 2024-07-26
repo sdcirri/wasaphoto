@@ -1,9 +1,10 @@
+![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white) ![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white) ![Vue.js](https://img.shields.io/badge/vuejs-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D) ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 # WASAPhoto
 Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto! You can
 upload your photos directly from your PC, and they will be visible to everyone following you.
 
-This project was realized for the [Web And Software Architecture course](http://gamificationlab.uniroma1.it/en/wasa/) at Sapienza.
-
+This project was realized for the [Web And Software Architecture course](http://gamificationlab.uniroma1.it/en/wasa/) at Sapienza, based on the [Fantastic Coffee (decaffeinated)](https://github.com/sapienzaapps/fantastic-coffee-decaffeinated)
+ template.
 # How to run
 ### Running in debug mode
 #### Backend
