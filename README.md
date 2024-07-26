@@ -14,7 +14,7 @@ This project was realized for the [Web And Software Architecture course](http://
 ```
 #### Frontend
 ```shell
-    $ ./run-npm.sh
+    $ ./open-npm.sh
     $ npm run dev
 ```
 ### Running in docker
