@@ -17,5 +17,5 @@ log:
 #  behindproxy: false
 debug: false
 db:
-  installroot: /tmp/db
-  filename: /tmp/db/wasaphoto.db
+  installroot: /app/db
+  filename: /app/db/wasaphoto.db
