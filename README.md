@@ -25,12 +25,12 @@ This project was realized for the [Web And Software Architecture course](http://
 #### Backend only
 ```shell
     $ docker build -t wasaphoto-backend:latest -f Dockerfile.backend .
-    $ docker run -t --rm -p 3000:3000 -v ./demo/db:/srv/wasaphoto wasaphoto-webapi:latest
+    $ docker run -t --rm -p 3000:3000 -v ./demo/db:/app/db wasaphoto-backend:latest
 ```
 #### Frontend only
 ```shell
     $ docker build -t wasaphoto-frontend:latest -f Dockerfile.frontend .
-    $ docker run -t --rm -p <PORT>:80 wasaphoto-webui:latest
+    $ docker run -t --rm -p <PORT>:80 wasaphoto-frontend:latest
 ```
 Your instance of WASAPhoto will be reachable through http://localhost:PORT/
 By default, the docker-compose will expose port 8080
