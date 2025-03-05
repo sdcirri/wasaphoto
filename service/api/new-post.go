@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/sdgondola/wasaphoto/service/database"
+	"github.com/sdcirri/wasaphoto/service/database"
 )
 
 type PostParams struct {

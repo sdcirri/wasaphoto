@@ -8,7 +8,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/sdgondola/wasaphoto/service/globaltime"
+	"github.com/sdcirri/wasaphoto/service/globaltime"
 )
 
 func (db *appdbimpl) NewPost(op int64, imgB64 string, caption string) (int64, error) {

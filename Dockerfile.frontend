@@ -14,5 +14,6 @@ FROM nginx:stable
 
 ### Copy the (built) app from the builder image
 COPY --from=builder /app/webui/dist /usr/share/nginx/html
+RUN chmod -R a+r /usr/share/nginx/html
 
 # (CMD and EXPOSE are already present in the nginx:stable container, no need to repeat)

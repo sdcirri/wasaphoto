@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/sdgondola/wasaphoto/service/globaltime"
+	"github.com/sdcirri/wasaphoto/service/globaltime"
 )
 
 func (db *appdbimpl) CommentPost(user int64, postID int64, comment string) (int64, error) {

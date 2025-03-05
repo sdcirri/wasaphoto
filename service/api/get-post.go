@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/sdgondola/wasaphoto/service/database"
+	"github.com/sdcirri/wasaphoto/service/database"
 )
 
 // Here we don't want to return the likes explicitly, but rather the like count

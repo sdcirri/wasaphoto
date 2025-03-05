@@ -1,4 +1,4 @@
-module github.com/sdgondola/wasaphoto
+module github.com/sdcirri/wasaphoto
 
 go 1.17
 

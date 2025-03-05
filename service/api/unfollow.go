@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/sdgondola/wasaphoto/service/database"
+	"github.com/sdcirri/wasaphoto/service/database"
 )
 
 func (rt *_router) unfollow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

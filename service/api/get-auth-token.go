@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sdgondola/wasaphoto/service/database"
+	"github.com/sdcirri/wasaphoto/service/database"
 )
 
 var ErrNoAuth = errors.New("unauthenticated")

@@ -37,9 +37,9 @@ import (
 
 	"github.com/ardanlabs/conf"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/sdgondola/wasaphoto/service/api"
-	"github.com/sdgondola/wasaphoto/service/database"
-	"github.com/sdgondola/wasaphoto/service/globaltime"
+	"github.com/sdcirri/wasaphoto/service/api"
+	"github.com/sdcirri/wasaphoto/service/database"
+	"github.com/sdcirri/wasaphoto/service/globaltime"
 	"github.com/sirupsen/logrus"
 )
 

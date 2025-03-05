@@ -21,15 +21,14 @@ RUN chmod 700 /app/webapi
 ### Copy configuration file
 RUN mkdir /etc/wasaphoto
 COPY --from=builder --chown=0:0 /src/demo/config_docker.yml /etc/wasaphoto/config.yml
-RUN chmod 750 /etc/wasaphoto/config.yml
+RUN chmod 700 /etc/wasaphoto/config.yml
 
 ### Mountpoint for database
-RUN mkdir /tmp/db
-RUN chown 0:0 /tmp/db
-RUN chmod 750 /tmp/db
+RUN mkdir /app/db
+RUN chown 0:0 /app/db
 ### Default propic
-COPY --from=builder --chown=0:0 /src/demo/propic_default.jpg /tmp/db/propic_default.jpg
-RUN chmod 750 /tmp/db/propic_default.jpg
+COPY --from=builder --chown=0:0 /src/demo/propic_default.jpg /app/db/propic_default.jpg
+RUN chmod -R 700 /app/db
 
 ### Configuration
 ENV CFG_CONFIG_PATH /etc/wasaphoto/config.yml
