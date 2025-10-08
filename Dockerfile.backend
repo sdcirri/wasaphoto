@@ -1,4 +1,4 @@
-FROM golang:1.22 AS builder
+FROM golang:1.25.2 AS builder
 
 ### Copy Go code
 WORKDIR /src/
@@ -8,7 +8,7 @@ COPY . .
 RUN go build -o /app/webapi ./cmd/webapi
 
 ### Create final container
-FROM debian:bookworm
+FROM debian:trixie
 
 ### Inform Docker about which port is used
 EXPOSE 3000 3000
